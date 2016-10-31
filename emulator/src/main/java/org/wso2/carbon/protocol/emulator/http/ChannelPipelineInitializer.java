@@ -1,21 +1,19 @@
 /*
- * *
- *  * Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
- *  *
- *  * WSO2 Inc. licenses this file to you under the Apache License,
- *  * Version 2.0 (the "License"); you may not use this file except
- *  * in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  * http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing,
- *  * software distributed under the License is distributed on an
- *  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- *  * KIND, either express or implied.  See the License for the
- *  * specific language governing permissions and limitations
- *  * under the License.
+ * Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 package org.wso2.carbon.protocol.emulator.http;
@@ -37,14 +35,14 @@ import org.wso2.carbon.protocol.emulator.http.server.handler.HttpChunkedWriteHan
 import org.wso2.carbon.protocol.emulator.http.server.handler.HttpServerHandler;
 
 /**
- * ChannelPipelineInitializer
+ * Class to initialize the Channel Pipeline.
  */
 public class ChannelPipelineInitializer extends ChannelInitializer<SocketChannel> {
+    private static final Logger log = Logger.getLogger(ChannelPipelineInitializer.class);
     private EmulatorType emulatorType;
     private HttpServerInformationContext serverInformationContext;
     private HttpClientInformationContext clientInformationContext;
     private MockServerThread[] handlers;
-    private static final Logger log = Logger.getLogger(ChannelPipelineInitializer.class);
 
     public ChannelPipelineInitializer(EmulatorType emulatorType, MockServerThread[] handlers) {
         this.emulatorType = emulatorType;
@@ -65,7 +63,6 @@ public class ChannelPipelineInitializer extends ChannelInitializer<SocketChannel
     }
 
     private void initializeHttpServerChannel(SocketChannel ch) {
-
         ChannelPipeline pipeline = ch.pipeline();
         pipeline.addLast(new HttpServerCodec());
         pipeline.addLast(new HttpChunkedWriteHandler(serverInformationContext));
@@ -73,7 +70,6 @@ public class ChannelPipelineInitializer extends ChannelInitializer<SocketChannel
         httpServerHandler.setHandlers(handlers);
         pipeline.addLast("httpResponseHandler", httpServerHandler);
         pipeline.addLast(new LoggingHandler(LogLevel.DEBUG));
-
     }
 
     private void initializeHttpClientChannel(SocketChannel ch) {
@@ -81,7 +77,6 @@ public class ChannelPipelineInitializer extends ChannelInitializer<SocketChannel
         pipeline.addLast(new HttpClientCodec());
         pipeline.addLast(new HttpClientHandler(clientInformationContext));
         pipeline.addLast(new LoggingHandler(LogLevel.DEBUG));
-
     }
 
     public void setServerInformationContext(HttpServerInformationContext serverInformationContext) {

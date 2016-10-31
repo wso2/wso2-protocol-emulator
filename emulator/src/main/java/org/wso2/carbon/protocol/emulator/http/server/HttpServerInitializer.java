@@ -1,21 +1,19 @@
 /*
- * *
- *  * Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
- *  *
- *  * WSO2 Inc. licenses this file to you under the Apache License,
- *  * Version 2.0 (the "License"); you may not use this file except
- *  * in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  * http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing,
- *  * software distributed under the License is distributed on an
- *  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- *  * KIND, either express or implied.  See the License for the
- *  * specific language governing permissions and limitations
- *  * under the License.
+ * Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 package org.wso2.carbon.protocol.emulator.http.server;
@@ -40,7 +38,7 @@ import java.io.InputStream;
 import java.util.Properties;
 
 /**
- * HttpServerInitializer
+ * Class to initialize the Http Server.
  */
 public class HttpServerInitializer extends Thread {
     private static final Logger log = Logger.getLogger(HttpServerInitializer.class);
@@ -53,6 +51,10 @@ public class HttpServerInitializer extends Thread {
     private InputStream inputStream;
     private int queues;
 
+    /**
+     * Initialize the Http Server instance.
+     * @param serverInformationContext
+     */
     public HttpServerInitializer(HttpServerInformationContext serverInformationContext) {
         this.serverInformationContext = serverInformationContext;
         prop = new Properties();
@@ -83,10 +85,8 @@ public class HttpServerInitializer extends Thread {
             queues = 0;
         }
 
-        //        SslContext sslCtx = null;
-
-
-        /*if (protocol == Protocol.HTTPS) {
+        /*SslContext sslCtx = null;
+        if (protocol == Protocol.HTTPS) {
             SelfSignedCertificate ssc = null;
             try {
                 ssc = new SelfSignedCertificate();

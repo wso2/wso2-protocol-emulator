@@ -1,21 +1,19 @@
 /*
- * *
- *  * Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
- *  *
- *  * WSO2 Inc. licenses this file to you under the Apache License,
- *  * Version 2.0 (the "License"); you may not use this file except
- *  * in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  * http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing,
- *  * software distributed under the License is distributed on an
- *  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- *  * KIND, either express or implied.  See the License for the
- *  * specific language governing permissions and limitations
- *  * under the License.
+ * Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 package org.wso2.carbon.protocol.emulator.http.client.processors;
@@ -31,7 +29,7 @@ import org.wso2.carbon.protocol.emulator.http.client.contexts.HttpResponseContex
 import java.util.Map;
 
 /**
- * Process the received response
+ * Class to process the received HTTP response.
  */
 public class HttpResponseInformationProcessor extends AbstractClientProcessor<HttpClientResponseProcessorContext> {
 
@@ -58,17 +56,16 @@ public class HttpResponseInformationProcessor extends AbstractClientProcessor<Ht
 
     private void populateResponseCookies(HttpClientResponseProcessorContext processorContext) {
 
-        //Cookie cookie = processorContext.getReceivedResponse().
+        /*Cookie cookie = processorContext.getReceivedResponse().
 
-        /*Map<String, List<String>> cookieParameters =
+        Map<String, List<String>> cookieParameters =
                 processorContext.getReceivedResponseContext().getCookieParameters();
 
         if (!cookieParameters.isEmpty()){
             for (Map.Entry<String, List<String>> entry : cookieParameters.entrySet()){
-                //processorContext.getReceivedResponseContext().addCookieParameter(entry.getKey(),entry.getValue());
+                processorContext.getReceivedResponseContext().addCookieParameter(entry.getKey(),entry.getValue());
             }
-        }
-*/
+        }*/
     }
 
     private void populateResponseStatusCode(HttpClientResponseProcessorContext processorContext) {

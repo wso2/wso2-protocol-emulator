@@ -116,13 +116,14 @@
     </dependencies>
 
     <properties>
+        <alpn-api.version>1.0.0</alpn-api.version>
+        <emulator.version>${project.version}</emulator.version>
         <netty.version>4.0.30.Final</netty.version>
         <slf4j.version>1.7.5</slf4j.version>
-        <alpn-api.version>1.0.0</alpn-api.version>
         <testng.version>6.9.8</testng.version>
 
         <export.package>
-            org.wso2.carbon.protocol.emulator.*
+            org.wso2.carbon.protocol.emulator.*;version=${emulator.version}
         </export.package>
         <dynamic.import.package>*</dynamic.import.package>
 

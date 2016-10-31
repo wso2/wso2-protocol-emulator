@@ -1,21 +1,19 @@
 /*
- * *
- *  * Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
- *  *
- *  * WSO2 Inc. licenses this file to you under the Apache License,
- *  * Version 2.0 (the "License"); you may not use this file except
- *  * in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  * http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing,
- *  * software distributed under the License is distributed on an
- *  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- *  * KIND, either express or implied.  See the License for the
- *  * specific language governing permissions and limitations
- *  * under the License.
+ * Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 package org.wso2.carbon.protocol.emulator.http.client;
@@ -38,7 +36,7 @@ import org.wso2.carbon.protocol.emulator.util.ValidationUtil;
 import java.util.Map;
 
 /**
- * Http client initializer
+ * Class to initialize the Http client.
  */
 public class HttpClientInitializer {
     private HttpClientInformationContext clientInformationContext;
@@ -47,9 +45,12 @@ public class HttpClientInitializer {
 
     public HttpClientInitializer(HttpClientInformationContext clientInformationContext) {
         this.clientInformationContext = clientInformationContext;
-
     }
 
+    /**
+     * Initialize the HTTP client.
+     * @throws Exception
+     */
     public void initialize() throws Exception {
         group = new NioEventLoopGroup();
         bootstrap = new Bootstrap();
@@ -70,6 +71,11 @@ public class HttpClientInitializer {
         shutdown();
     }
 
+    /**
+     * Send the request using HTTP client instance.
+     * @param httpClientProcessorContext
+     * @throws Exception
+     */
     private void sendMessage(HttpClientRequestProcessorContext httpClientProcessorContext) throws Exception {
         new HttpRequestInformationProcessor().process(httpClientProcessorContext);
         HttpClientConfigBuilderContext clientConfigBuilderContext = httpClientProcessorContext
@@ -83,6 +89,9 @@ public class HttpClientInitializer {
         ch.closeFuture().sync();
     }
 
+    /**
+     * Shutdown the HTTP client instance.
+     */
     public void shutdown() {
         group.shutdownGracefully();
     }
