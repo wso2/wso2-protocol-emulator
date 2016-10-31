@@ -32,7 +32,8 @@ public class HttpServerThenBuilderContext extends AbstractThenBuilderContext<Htt
     private List<HttpServerWhenBuilderContext> whenBuilderContextList;
 
     public HttpServerThenBuilderContext(List<HttpServerWhenBuilderContext> whenBuilderContextList,
-                                        HttpServerRequestBuilderContext requestContext, HttpServerInformationContext httpServerInformationContext) {
+                                        HttpServerRequestBuilderContext requestContext,
+                                        HttpServerInformationContext httpServerInformationContext) {
         this.requestContext = requestContext;
         this.httpServerInformationContext = httpServerInformationContext;
         this.whenBuilderContextList = whenBuilderContextList;
