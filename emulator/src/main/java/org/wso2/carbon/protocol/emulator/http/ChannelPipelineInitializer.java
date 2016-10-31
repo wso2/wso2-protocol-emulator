@@ -62,6 +62,10 @@ public class ChannelPipelineInitializer extends ChannelInitializer<SocketChannel
         }
     }
 
+    /**
+     * Initialize Http Server Channel.
+     * @param ch {instance of SocketChannel}
+     */
     private void initializeHttpServerChannel(SocketChannel ch) {
         ChannelPipeline pipeline = ch.pipeline();
         pipeline.addLast(new HttpServerCodec());
