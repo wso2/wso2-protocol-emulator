@@ -71,7 +71,6 @@ public class HttpRequestInformationProcessor extends AbstractClientProcessor<Htt
 
         ByteBuf content;
         HttpRequest request;
-
         if (processorContext.getRequestBuilderContext().getBody() != null) {
 
             String rawData = processorContext.getRequestBuilderContext().getBody();

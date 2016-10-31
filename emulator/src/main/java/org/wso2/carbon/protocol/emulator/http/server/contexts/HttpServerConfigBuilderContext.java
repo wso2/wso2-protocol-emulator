@@ -249,7 +249,7 @@ public class HttpServerConfigBuilderContext extends AbstractConfigurationBuilder
         this.connectionFail = true;
         return this;
     }
-    
+
     public HttpServerConfigBuilderContext withEnableWireLog() {
         wireLog = true;
         return this;

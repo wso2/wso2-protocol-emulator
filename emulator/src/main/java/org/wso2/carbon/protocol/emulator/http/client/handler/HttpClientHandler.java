@@ -91,7 +91,7 @@ public class HttpClientHandler extends ChannelInboundHandlerAdapter {
         }
     }
 
-        @Override
+    @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         log.error(cause);
         ctx.close();

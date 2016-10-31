@@ -130,7 +130,7 @@ public class HttpServerRequestBuilderContext extends AbstractRequestBuilderConte
     }
 
     public HttpServerRequestBuilderContext withQueryParameters(QueryParameterOperation queryOperation,
-            QueryParameter... queryParameters) {
+                                                               QueryParameter... queryParameters) {
         this.queryOperation = queryOperation;
         this.queryParameters = Arrays.asList(queryParameters);
         return this;

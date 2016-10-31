@@ -35,7 +35,7 @@ public class HttpServerWhenBuilderContext extends AbstractWhenBuilderContext<Htt
     private HttpServerOperationBuilderContext httpServerOperationBuilderContext;
 
     public HttpServerWhenBuilderContext(List<HttpServerWhenBuilderContext> whenBuilderContextList,
-            HttpServerInformationContext httpServerInformationContext) {
+                                        HttpServerInformationContext httpServerInformationContext) {
         this.httpServerInformationContext = httpServerInformationContext;
         this.whenBuilderContextList = whenBuilderContextList;
         this.whenBuilderContextList.add(this);

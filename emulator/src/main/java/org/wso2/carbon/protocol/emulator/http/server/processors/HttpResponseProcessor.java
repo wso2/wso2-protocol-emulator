@@ -83,7 +83,7 @@ public class HttpResponseProcessor extends AbstractServerProcessor {
     }
 
     private String patternMatcher(HttpRequestContext requestContext, HttpServerResponseBuilderContext responseContext,
-            Pattern pathRegex) {
+                                  Pattern pathRegex) {
         String responseBody = responseContext.getBody();
         String requestBody = requestContext.getRequestBody();
         Matcher matcher = null;
