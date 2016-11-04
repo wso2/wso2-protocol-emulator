@@ -40,17 +40,6 @@
         <tag>HEAD</tag>
     </scm>
 
-    <!--<pluginRepositories>
-        <pluginRepository>
-            <id>wso2-maven2-repository-1</id>
-            <url>http://dist.wso2.org/maven2</url>
-        </pluginRepository>
-        <pluginRepository>
-            <id>wso2-maven2-repository-2</id>
-            <url>http://dist.wso2.org/snapshots/maven2</url>
-        </pluginRepository>
-    </pluginRepositories>
--->
     <dependencyManagement>
         <dependencies>
             <dependency>
