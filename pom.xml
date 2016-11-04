@@ -27,7 +27,7 @@
     <groupId>org.wso2.carbon.protocol.emulator</groupId>
     <artifactId>org.wso2.carbon.protocol.emulator.parent</artifactId>
     <packaging>pom</packaging>
-    <version>1.0.0</version>
+    <version>1.0.1-SNAPSHOT</version>
     <name>WSO2 Carbon Protocol Emulator Parent</name>
     <url>http://wso2.org</url>
 
@@ -36,7 +36,7 @@
         <developerConnection>scm:git:https://github.com/wso2/wso2-protocol-emulator.git
         </developerConnection>
         <connection>scm:git:https://github.com/wso2/wso2-protocol-emulator.git</connection>
-        <tag>v1.0.0</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <dependencyManagement>
