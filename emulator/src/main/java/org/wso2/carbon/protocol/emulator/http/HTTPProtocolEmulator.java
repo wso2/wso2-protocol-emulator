@@ -36,9 +36,7 @@ public class HTTPProtocolEmulator extends AbstractProtocolEmulator {
         HttpServerInformationContext serverInformationContext = new HttpServerInformationContext();
         HttpServerInitializer serverInitializer = new HttpServerInitializer(serverInformationContext);
         serverInformationContext.setHttpServerInitializer(serverInitializer);
-        HttpServerGivenBuilderContext serverGivenBuilderContext = new HttpServerGivenBuilderContext(
-                serverInformationContext);
-        return serverGivenBuilderContext;
+        return new HttpServerGivenBuilderContext(serverInformationContext);
     }
 
     @Override
@@ -46,8 +44,6 @@ public class HTTPProtocolEmulator extends AbstractProtocolEmulator {
         HttpClientInformationContext clientInformationContext = new HttpClientInformationContext();
         HttpClientInitializer clientInitializer = new HttpClientInitializer(clientInformationContext);
         clientInformationContext.setClientInitializer(clientInitializer);
-        HttpClientGivenBuilderContext clientGivenBuilderContext = new HttpClientGivenBuilderContext(
-                clientInformationContext);
-        return clientGivenBuilderContext;
+        return new HttpClientGivenBuilderContext(clientInformationContext);
     }
 }

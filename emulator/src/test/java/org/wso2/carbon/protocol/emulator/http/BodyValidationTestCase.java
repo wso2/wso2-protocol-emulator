@@ -30,9 +30,9 @@ import org.wso2.carbon.protocol.emulator.http.client.contexts.HttpClientRequestB
 import org.wso2.carbon.protocol.emulator.http.client.contexts.HttpClientResponseBuilderContext;
 import org.wso2.carbon.protocol.emulator.http.client.contexts.HttpClientResponseProcessorContext;
 import org.wso2.carbon.protocol.emulator.http.params.Header;
+import org.wso2.carbon.protocol.emulator.http.server.contexts.HttpServerConfigBuilderContext;
 import org.wso2.carbon.protocol.emulator.http.server.contexts.HttpServerOperationBuilderContext;
 
-import static org.wso2.carbon.protocol.emulator.http.server.contexts.HttpServerConfigBuilderContext.configure;
 import static org.wso2.carbon.protocol.emulator.http.server.contexts.HttpServerRequestBuilderContext.request;
 import static org.wso2.carbon.protocol.emulator.http.server.contexts.HttpServerResponseBuilderContext.response;
 
@@ -191,7 +191,8 @@ public class BodyValidationTestCase {
     }
 
     private HttpServerOperationBuilderContext startHttpEmulator() {
-        return Emulator.getHttpEmulator().server().given(configure().host("127.0.0.1").port(6065).context("/users").
+        return Emulator.getHttpEmulator().server().given(HttpServerConfigBuilderContext.configure().host("127.0.0.1")
+                                                                                       .port(6065).context("/users").
         withEnableWireLog())
 
                 .when(request().withMethod(HttpMethod.POST).withPath("/user20"))

@@ -110,6 +110,7 @@ public class HttpServerInitializer extends Thread {
         try {
             ServerBootstrap serverBootstrap = new ServerBootstrap();
             int connectTimeOut = serverInformationContext.getServerConfigBuilderContext().getConnectTimeOut();
+
             if (connectTimeOut != 0) {
                 try {
                     Thread.sleep(connectTimeOut);

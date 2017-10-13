@@ -30,7 +30,6 @@ import java.io.File;
  * Class for Http Server ConfigBuilderContext.
  */
 public class HttpServerConfigBuilderContext extends AbstractConfigurationBuilderContext {
-    private static HttpServerConfigBuilderContext config;
     private String host = null;
     private int port;
     private String context;
@@ -58,13 +57,8 @@ public class HttpServerConfigBuilderContext extends AbstractConfigurationBuilder
     private boolean connectionFail = false;
     private boolean wireLog = false;
 
-    private static HttpServerConfigBuilderContext getInstance() {
-        config = new HttpServerConfigBuilderContext();
-        return config;
-    }
-
     public static HttpServerConfigBuilderContext configure() {
-        return getInstance();
+        return new HttpServerConfigBuilderContext();
     }
 
     public boolean isWireLog() {
