@@ -25,6 +25,7 @@ import io.netty.handler.codec.http.HttpContent;
 import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.LastHttpContent;
 import org.apache.log4j.Logger;
+import org.wso2.carbon.protocol.emulator.http.client.contexts.HttpClientConfigBuilderContext;
 import org.wso2.carbon.protocol.emulator.http.client.contexts.HttpClientInformationContext;
 import org.wso2.carbon.protocol.emulator.http.client.contexts.HttpClientResponseProcessorContext;
 import org.wso2.carbon.protocol.emulator.http.client.processors.HttpResponseAssertProcessor;
@@ -53,8 +54,16 @@ public class HttpClientHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
+        HttpClientConfigBuilderContext configBuilderContext
+                = clientInformationContext.getClientConfigBuilderContext();
 
         WireLogHandler.responseWireLog(msg);
+
+        Boolean connectionDrop = configBuilderContext.getReadingConnectionDrop();
+        if (connectionDrop != null && connectionDrop && ctx.channel().isOpen()) {
+            ctx.close();
+            log.info("Client Connection dropped while Reading data from the channel");
+        }
 
         if (msg instanceof HttpResponse) {
             this.processorContext = new HttpClientResponseProcessorContext();
