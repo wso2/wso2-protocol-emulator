@@ -67,11 +67,15 @@ public class ChannelPipelineInitializer extends ChannelInitializer<SocketChannel
 
     /**
      * Initialize Http Server Channel.
+     *
      * @param ch {instance of SocketChannel}
      */
     private void initializeHttpServerChannel(SocketChannel ch) {
         ChannelPipeline pipeline = ch.pipeline();
-        pipeline.addLast(new SlowReadingHandler(serverInformationContext));
+        int delay = serverInformationContext.getServerConfigBuilderContext().getReadingDelay();
+        if (delay > 0) {
+            pipeline.addLast(new SlowReadingHandler(delay));
+        }
         pipeline.addLast(new HttpServerCodec());
         pipeline.addLast(new HttpChunkedWriteHandler(serverInformationContext));
         HttpServerHandler httpServerHandler = new HttpServerHandler(serverInformationContext);
