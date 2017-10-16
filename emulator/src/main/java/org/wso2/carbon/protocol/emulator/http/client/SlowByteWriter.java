@@ -18,26 +18,27 @@
 
 package org.wso2.carbon.protocol.emulator.http.client;
 
-import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
 
+import java.util.concurrent.TimeUnit;
+
 /**
- * Drop the connection after writing half of the bytes
+ * Delay the writing by configured time
  */
-public class ConnectionDroppingWriter extends ChannelOutboundHandlerAdapter {
+public class SlowByteWriter extends ChannelOutboundHandlerAdapter {
+    private final int writingDelay;
+
+    public SlowByteWriter(int writingDelay) {
+        this.writingDelay = writingDelay;
+    }
 
     @Override
     public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-        if (msg instanceof ByteBuf) {
-            ByteBuf buffer = (ByteBuf) msg;
 
-            ByteBuf halfBuf = buffer.slice(buffer.readerIndex(), buffer.readableBytes() / 2);
-            ctx.writeAndFlush(halfBuf, promise).addListener(ChannelFutureListener.CLOSE);
-        } else {
-            ctx.write(msg, promise);
-        }
+        TimeUnit.MILLISECONDS.sleep(writingDelay);
+
+        ctx.write(msg, promise);
     }
 }
