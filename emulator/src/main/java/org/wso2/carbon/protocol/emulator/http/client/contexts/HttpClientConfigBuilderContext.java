@@ -38,6 +38,7 @@ public class HttpClientConfigBuilderContext extends AbstractConfigurationBuilder
     private File trustStore;
     private String trustStorePass;
     private boolean readingConnectionDrop;
+    private boolean partialWriteConnectionDrop;
 
     private static HttpClientConfigBuilderContext getInstance() {
         clientConfigBuilderContext = new HttpClientConfigBuilderContext();
@@ -76,6 +77,11 @@ public class HttpClientConfigBuilderContext extends AbstractConfigurationBuilder
 
     public HttpClientConfigBuilderContext withEnableReadingConnectionDrop() {
         this.readingConnectionDrop = true;
+        return this;
+    }
+
+    public HttpClientConfigBuilderContext withPartialWriteConnectionDrop() {
+        this.partialWriteConnectionDrop = true;
         return this;
     }
 
@@ -147,5 +153,9 @@ public class HttpClientConfigBuilderContext extends AbstractConfigurationBuilder
 
     public Boolean getReadingConnectionDrop() {
         return readingConnectionDrop;
+    }
+
+    public Boolean getPartialWriteConnectionDrop() {
+        return partialWriteConnectionDrop;
     }
 }
