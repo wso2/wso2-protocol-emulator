@@ -56,6 +56,7 @@ public class HttpServerConfigBuilderContext extends AbstractConfigurationBuilder
     private int connectTimeOut = 0;
     private boolean connectionFail = false;
     private boolean wireLog = false;
+    private boolean keepAlive = true;
 
     public static HttpServerConfigBuilderContext configure() {
         return new HttpServerConfigBuilderContext();
@@ -91,6 +92,10 @@ public class HttpServerConfigBuilderContext extends AbstractConfigurationBuilder
 
     public int getWriteTimeOut() {
         return writeTimeOut;
+    }
+
+    public boolean isKeepAlive() {
+        return keepAlive;
     }
 
     public HttpServerConfigBuilderContext keyStore(File keyStore) {
@@ -244,6 +249,11 @@ public class HttpServerConfigBuilderContext extends AbstractConfigurationBuilder
 
     public HttpServerConfigBuilderContext withEnableWireLog() {
         wireLog = true;
+        return this;
+    }
+
+    public HttpServerConfigBuilderContext withDisableKeepAlive() {
+        keepAlive = false;
         return this;
     }
 
