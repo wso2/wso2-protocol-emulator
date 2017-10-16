@@ -95,6 +95,12 @@ public class ChannelPipelineInitializer extends ChannelInitializer<SocketChannel
         if (writingDelay > 0) {
             pipeline.addLast(new SlowByteWriter(writingDelay));
         }
+
+        int readingDelay = clientInformationContext.getClientConfigBuilderContext().getReadingDelay();
+        if (readingDelay > 0) {
+            pipeline.addLast(new SlowReadingHandler(readingDelay));
+        }
+
         pipeline.addLast(new HttpClientCodec());
         pipeline.addLast(new HttpClientHandler(clientInformationContext));
         pipeline.addLast(new LoggingHandler(LogLevel.DEBUG));
