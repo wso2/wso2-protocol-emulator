@@ -141,7 +141,6 @@ public class HttpServerHandler extends ChannelInboundHandlerAdapter {
                 httpRequestInformationProcessor.process(httpProcessorContext);
 
             } else {
-                readingDelay(serverConfigBuilderContext.getReadingDelay(), ctx);
                 if (msg instanceof HttpContent) {
                     HttpContent httpContent = (HttpContent) msg;
                     if (httpContent.content().isReadable()) {
@@ -239,19 +238,6 @@ public class HttpServerHandler extends ChannelInboundHandlerAdapter {
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         log.error("Exception occurred while processing the response", cause);
         ctx.close();
-    }
-
-    private void readingDelay(int delay, ChannelHandlerContext ctx) {
-        if (delay != 0) {
-            ScheduledFuture scheduledFuture = scheduledReadingExecutorService
-                    .schedule(readingCallable, delay, TimeUnit.MILLISECONDS);
-            try {
-                scheduledFuture.get();
-            } catch (InterruptedException | ExecutionException e) {
-                log.error(e);
-            }
-            //scheduledReadingExecutorService.shutdown();
-        }
     }
 
     private void businessLogicDelay(int delay, ChannelHandlerContext ctx) {

@@ -34,6 +34,7 @@ import org.wso2.carbon.protocol.emulator.http.server.contexts.HttpServerInformat
 import org.wso2.carbon.protocol.emulator.http.server.contexts.MockServerThread;
 import org.wso2.carbon.protocol.emulator.http.server.handler.HttpChunkedWriteHandler;
 import org.wso2.carbon.protocol.emulator.http.server.handler.HttpServerHandler;
+import org.wso2.carbon.protocol.emulator.http.server.handler.SlowReadingHandler;
 
 /**
  * Class to initialize the Channel Pipeline.
@@ -69,6 +70,7 @@ public class ChannelPipelineInitializer extends ChannelInitializer<SocketChannel
      */
     private void initializeHttpServerChannel(SocketChannel ch) {
         ChannelPipeline pipeline = ch.pipeline();
+        pipeline.addLast(new SlowReadingHandler(serverInformationContext));
         pipeline.addLast(new HttpServerCodec());
         pipeline.addLast(new HttpChunkedWriteHandler(serverInformationContext));
         HttpServerHandler httpServerHandler = new HttpServerHandler(serverInformationContext);
