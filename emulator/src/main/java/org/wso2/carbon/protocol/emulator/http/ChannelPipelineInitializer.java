@@ -28,6 +28,7 @@ import io.netty.handler.logging.LoggingHandler;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.protocol.emulator.dsl.EmulatorType;
 import org.wso2.carbon.protocol.emulator.http.client.ConnectionDroppingWriter;
+import org.wso2.carbon.protocol.emulator.http.client.SlowByteWriter;
 import org.wso2.carbon.protocol.emulator.http.client.contexts.HttpClientInformationContext;
 import org.wso2.carbon.protocol.emulator.http.client.handler.HttpClientHandler;
 import org.wso2.carbon.protocol.emulator.http.server.contexts.HttpServerInformationContext;
@@ -82,6 +83,11 @@ public class ChannelPipelineInitializer extends ChannelInitializer<SocketChannel
 
         if (clientInformationContext.getClientConfigBuilderContext().getPartialWriteConnectionDrop()) {
             pipeline.addLast(new ConnectionDroppingWriter());
+        }
+
+        int writingDelay = clientInformationContext.getClientConfigBuilderContext().getWritingDelay();
+        if (writingDelay > 0) {
+            pipeline.addLast(new SlowByteWriter(writingDelay));
         }
         pipeline.addLast(new HttpClientCodec());
         pipeline.addLast(new HttpClientHandler(clientInformationContext));

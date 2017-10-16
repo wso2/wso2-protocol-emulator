@@ -39,6 +39,7 @@ public class HttpClientConfigBuilderContext extends AbstractConfigurationBuilder
     private String trustStorePass;
     private boolean readingConnectionDrop;
     private boolean partialWriteConnectionDrop;
+    private int writingDelay = 0;
 
     private static HttpClientConfigBuilderContext getInstance() {
         clientConfigBuilderContext = new HttpClientConfigBuilderContext();
@@ -126,6 +127,11 @@ public class HttpClientConfigBuilderContext extends AbstractConfigurationBuilder
         return this;
     }
 
+    public HttpClientConfigBuilderContext withWritingDelay(int writingDelay) {
+        this.writingDelay = writingDelay;
+        return this;
+    }
+
     public HttpClientConfigBuilderContext withProtocol(Protocol protocol) {
         this.protocol = protocol;
         return this;
@@ -149,6 +155,10 @@ public class HttpClientConfigBuilderContext extends AbstractConfigurationBuilder
 
     public int getReadingDelay() {
         return readingDelay;
+    }
+
+    public int getWritingDelay() {
+        return writingDelay;
     }
 
     public Boolean getReadingConnectionDrop() {

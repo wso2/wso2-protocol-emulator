@@ -20,6 +20,7 @@ package org.wso2.carbon.protocol.emulator.http.client;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
@@ -58,6 +59,10 @@ public class HttpClientInitializer {
                 null);
         channelPipelineInitializer.setClientInformationContext(clientInformationContext);
         bootstrap.group(group).channel(NioSocketChannel.class).handler(channelPipelineInitializer);
+
+        if (clientInformationContext.getClientConfigBuilderContext().getWritingDelay() > 0) {
+            bootstrap.option(ChannelOption.SO_SNDBUF, 1);
+        }
 
         for (Map.Entry<HttpClientRequestBuilderContext, HttpClientResponseBuilderContext> entry
                 : clientInformationContext
