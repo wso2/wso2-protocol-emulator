@@ -56,7 +56,8 @@ public class HttpResponseProcessor extends AbstractServerProcessor {
     private void populateResponse(HttpServerProcessorContext processorContext) {
         HttpRequestContext requestContext = processorContext.getHttpRequestContext();
         HttpServerResponseBuilderContext responseContext = processorContext.getSelectedResponseContext();
-        boolean keepAlive = requestContext.isKeepAlive();
+        boolean keepAlive = requestContext.isKeepAlive() &&
+                processorContext.getServerInformationContext().getServerConfigBuilderContext().isKeepAlive();
         Pattern pattern = processorContext.getServerInformationContext().getUtilityContext().getPattern();
         HttpResponseStatus httpResponseStatus = responseContext.getStatusCode();
 
@@ -144,7 +145,7 @@ public class HttpResponseProcessor extends AbstractServerProcessor {
         if (responseContext.getCookies() != null) {
             for (Cookie cookie : responseContext.getCookies()) {
                 response.headers().add(HttpHeaders.Names.SET_COOKIE,
-                        ServerCookieEncoder.encode(cookie.getName(), cookie.getValue()));
+                                       ServerCookieEncoder.encode(cookie.getName(), cookie.getValue()));
             }
         }
     }

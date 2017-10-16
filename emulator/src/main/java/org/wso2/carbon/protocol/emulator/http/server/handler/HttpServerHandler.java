@@ -215,7 +215,8 @@ public class HttpServerHandler extends ChannelInboundHandlerAdapter {
                 }
             } else {
                 FullHttpResponse response = httpProcessorContext.getFinalResponse();
-                if (httpProcessorContext.getHttpRequestContext().isKeepAlive()) {
+                if (httpProcessorContext.getHttpRequestContext().isKeepAlive() &&
+                        serverInformationContext.getServerConfigBuilderContext().isKeepAlive()) {
                     randomConnectionClose(ctx, this.index, 2);
                     ctx.write(response);
                 } else {
