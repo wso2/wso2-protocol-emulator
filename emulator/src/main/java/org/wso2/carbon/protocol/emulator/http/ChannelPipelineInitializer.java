@@ -30,6 +30,7 @@ import org.apache.log4j.Logger;
 import org.wso2.carbon.protocol.emulator.dsl.EmulatorType;
 import org.wso2.carbon.protocol.emulator.http.client.ConnectionDroppingWriter;
 import org.wso2.carbon.protocol.emulator.http.client.contexts.HttpClientInformationContext;
+import org.wso2.carbon.protocol.emulator.http.client.contexts.RequestResponseCorrelation;
 import org.wso2.carbon.protocol.emulator.http.client.handler.HttpClientHandler;
 import org.wso2.carbon.protocol.emulator.http.common.handler.SlowByteWriterHandler;
 import org.wso2.carbon.protocol.emulator.http.common.handler.SlowReadingHandler;
@@ -47,6 +48,7 @@ public class ChannelPipelineInitializer extends ChannelInitializer<SocketChannel
     private EmulatorType emulatorType;
     private HttpServerInformationContext serverInformationContext;
     private HttpClientInformationContext clientInformationContext;
+    private RequestResponseCorrelation requestResponseCorrelation;
     private MockServerThread[] handlers;
 
     public ChannelPipelineInitializer(EmulatorType emulatorType, MockServerThread[] handlers) {
@@ -112,7 +114,7 @@ public class ChannelPipelineInitializer extends ChannelInitializer<SocketChannel
         }
 
         pipeline.addLast(new HttpClientCodec());
-        pipeline.addLast(new HttpClientHandler(clientInformationContext));
+        pipeline.addLast(new HttpClientHandler(clientInformationContext, requestResponseCorrelation));
         pipeline.addLast(new LoggingHandler(LogLevel.DEBUG));
     }
 
@@ -122,5 +124,9 @@ public class ChannelPipelineInitializer extends ChannelInitializer<SocketChannel
 
     public void setClientInformationContext(HttpClientInformationContext clientInformationContext) {
         this.clientInformationContext = clientInformationContext;
+    }
+
+    public void setRequestResponseCorrelation(RequestResponseCorrelation responseProcessorContext) {
+        this.requestResponseCorrelation = responseProcessorContext;
     }
 }

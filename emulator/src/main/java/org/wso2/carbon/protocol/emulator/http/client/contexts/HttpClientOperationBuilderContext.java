@@ -39,6 +39,26 @@ public class HttpClientOperationBuilderContext extends AbstractClientOperationBu
         } catch (Exception e) {
             log.error("Exception occurred while sending message" + e);
         }
-        return httpClientInformationContext.getReceivedResponseProcessContext();
+        return httpClientInformationContext.getLastReceivedResponseProcessContext();
     }
+
+    @Override
+    public void sendAsync() {  //recommanded for a one request only
+        try {
+            this.httpClientInformationContext.getClientInitializer().initializeAsync();
+        } catch (Exception e) {
+            log.error("Exception occurred while sending message", e);
+        }
+    }
+
+    @Override
+    public void shutdown() {
+        try {
+            this.httpClientInformationContext.getClientInitializer().shutdownClients();
+        } catch (InterruptedException e) {
+            log.error("Exception occurred while shutting down clients", e);
+        }
+    }
+
+
 }

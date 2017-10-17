@@ -24,17 +24,8 @@ import io.netty.handler.codec.http.HttpResponse;
  * Class for get and set Response of server.
  */
 public class HttpClientResponseProcessorContext extends HttpClientProcessorContext {
-    private HttpClientResponseBuilderContext expectedResponse;
     private HttpResponseContext receivedResponseContext;
     private HttpResponse receivedResponse;
-
-    public HttpClientResponseBuilderContext getExpectedResponseContext() {
-        return expectedResponse;
-    }
-
-    public void setExpectedResponse(HttpClientResponseBuilderContext expectedResponse) {
-        this.expectedResponse = expectedResponse;
-    }
 
     public HttpResponseContext getReceivedResponseContext() {
         return receivedResponseContext;

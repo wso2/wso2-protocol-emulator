@@ -19,6 +19,7 @@
 package org.wso2.carbon.protocol.emulator.http.client.processors;
 
 import org.apache.log4j.Logger;
+import org.wso2.carbon.protocol.emulator.http.client.contexts.HttpClientResponseBuilderContext;
 import org.wso2.carbon.protocol.emulator.http.client.contexts.HttpClientResponseProcessorContext;
 import org.wso2.carbon.protocol.emulator.http.params.Header;
 import org.wso2.carbon.protocol.emulator.http.params.HeaderOperation;
@@ -29,22 +30,23 @@ import java.util.Map;
 /**
  * Class to assert the received HTTP response with expected HTTP response.
  */
-public class HttpResponseAssertProcessor extends AbstractClientProcessor<HttpClientResponseProcessorContext> {
+public class HttpResponseAssertProcessor {
 
     private static final Logger log = Logger.getLogger(HttpResponseAssertProcessor.class);
 
-    @Override
-    public void process(HttpClientResponseProcessorContext processorContext) {
+    public static void process(HttpClientResponseProcessorContext processorContext,
+            HttpClientResponseBuilderContext expectedResponseContext) {
 
-        if (!processorContext.getExpectedResponseContext().getAssertionStatus()) {
-            assertResponseContent(processorContext);
-            assertHeaderParameters(processorContext);
+        if (!expectedResponseContext.getAssertionStatus()) {
+            assertResponseContent(processorContext, expectedResponseContext);
+            assertHeaderParameters(processorContext, expectedResponseContext);
         }
     }
 
-    private void assertResponseContent(HttpClientResponseProcessorContext processorContext) {
+    private static void assertResponseContent(HttpClientResponseProcessorContext processorContext,
+            HttpClientResponseBuilderContext expectedResponseContext) {
 
-        if (processorContext.getExpectedResponseContext().getBody()
+        if (expectedResponseContext.getBody()
                 .equalsIgnoreCase(processorContext.getReceivedResponseContext().getResponseBody())) {
             log.info("Equal content");
         } else {
@@ -52,14 +54,13 @@ public class HttpResponseAssertProcessor extends AbstractClientProcessor<HttpCli
         }
     }
 
-    private void assertHeaderParameters(HttpClientResponseProcessorContext processorContext) {
-        if (processorContext.getExpectedResponseContext().getHeaders() == null || processorContext
-                .getExpectedResponseContext().getHeaders().isEmpty()) {
+    private static void assertHeaderParameters(HttpClientResponseProcessorContext processorContext,
+            HttpClientResponseBuilderContext expectedResponseContext) {
+        if (expectedResponseContext.getHeaders() == null || expectedResponseContext.getHeaders().isEmpty()) {
             return;
         }
         Map<String, List<String>> receivedHeaders = processorContext.getReceivedResponseContext().getHeaderParameters();
-        HeaderOperation operation = processorContext.getClientInformationContext().getExpectedResponse()
-                .getOperations();
+        HeaderOperation operation = expectedResponseContext.getOperations();
 
         boolean value = false;
         if (operation == HeaderOperation.AND) {
@@ -69,7 +70,7 @@ public class HttpResponseAssertProcessor extends AbstractClientProcessor<HttpCli
                 entry.getKey();
             }
 
-            for (Header header : processorContext.getExpectedResponseContext().getHeaders()) {
+            for (Header header : expectedResponseContext.getHeaders()) {
                 List<String> receivedHeaderValues = receivedHeaders.get(header.getName());
 
                 if (receivedHeaderValues == null || receivedHeaderValues.isEmpty() || !receivedHeaderValues
@@ -81,7 +82,7 @@ public class HttpResponseAssertProcessor extends AbstractClientProcessor<HttpCli
                 }
             }
         } else if (operation == operation.OR) {
-            for (Header header : processorContext.getExpectedResponseContext().getHeaders()) {
+            for (Header header : expectedResponseContext.getHeaders()) {
                 List<String> receivedHeaderValues = receivedHeaders.get(header.getName());
 
                 if (receivedHeaderValues == null || receivedHeaderValues.isEmpty() || !receivedHeaderValues
@@ -103,8 +104,8 @@ public class HttpResponseAssertProcessor extends AbstractClientProcessor<HttpCli
                 List<String> value1 = header.getValue();
                 for (String val : value1) {
                     Header header1 = new Header(header.getKey(), val);
-                    if (processorContext.getExpectedResponseContext().getHeaders().get(0).getValue()
-                            .equals(header1.getValue()) && processorContext.getExpectedResponseContext().getHeaders()
+                    if (expectedResponseContext.getHeaders().get(0).getValue()
+                            .equals(header1.getValue()) && expectedResponseContext.getHeaders()
                             .get(0).getName().equals(header1.getName())) {
                         match = true;
                     }
