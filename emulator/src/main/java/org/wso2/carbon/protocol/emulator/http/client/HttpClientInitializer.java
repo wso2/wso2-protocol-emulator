@@ -28,13 +28,13 @@ import org.wso2.carbon.protocol.emulator.dsl.EmulatorType;
 import org.wso2.carbon.protocol.emulator.http.ChannelPipelineInitializer;
 import org.wso2.carbon.protocol.emulator.http.client.contexts.HttpClientConfigBuilderContext;
 import org.wso2.carbon.protocol.emulator.http.client.contexts.HttpClientInformationContext;
-import org.wso2.carbon.protocol.emulator.http.client.contexts.HttpClientRequestBuilderContext;
 import org.wso2.carbon.protocol.emulator.http.client.contexts.HttpClientRequestProcessorContext;
-import org.wso2.carbon.protocol.emulator.http.client.contexts.HttpClientResponseBuilderContext;
+import org.wso2.carbon.protocol.emulator.http.client.contexts.RequestResponseCorrelation;
 import org.wso2.carbon.protocol.emulator.http.client.processors.HttpRequestInformationProcessor;
 import org.wso2.carbon.protocol.emulator.util.ValidationUtil;
 
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Class to initialize the Http client.
@@ -43,6 +43,8 @@ public class HttpClientInitializer {
     private HttpClientInformationContext clientInformationContext;
     private EventLoopGroup group;
     private Bootstrap bootstrap;
+    private List<HttpClientRequestProcessorContext> processorContextList = new ArrayList<>();
+    ;
 
     public HttpClientInitializer(HttpClientInformationContext clientInformationContext) {
         this.clientInformationContext = clientInformationContext;
@@ -64,33 +66,86 @@ public class HttpClientInitializer {
             bootstrap.option(ChannelOption.SO_SNDBUF, 1);
         }
 
-        for (Map.Entry<HttpClientRequestBuilderContext, HttpClientResponseBuilderContext> entry
-                : clientInformationContext
-                .getRequestResponseCorrelation().entrySet()) {
-            clientInformationContext.setExpectedResponse(entry.getValue());
+        processorContextList.clear();
+
+        for (RequestResponseCorrelation requestResponseCorrelation : clientInformationContext
+                .getRequestResponseCorrelation()) {
+            channelPipelineInitializer.setRequestResponseCorrelation(requestResponseCorrelation);
             HttpClientRequestProcessorContext processorContext = new HttpClientRequestProcessorContext();
-            processorContext.setRequestBuilderContext(entry.getKey());
+            processorContext.setRequestBuilderContext(requestResponseCorrelation.getRequestBuilderContext());
             processorContext.setClientInformationContext(clientInformationContext);
-            sendMessage(processorContext);
+            sendAndWaitForChannelClose(processorContext);
+            processorContextList.add(processorContext);
         }
+
         shutdown();
     }
 
     /**
-     * Send the request using HTTP client instance.
-     * @param httpClientProcessorContext
+     * Initialize the HTTP client.
      * @throws Exception
      */
-    private void sendMessage(HttpClientRequestProcessorContext httpClientProcessorContext) throws Exception {
-        new HttpRequestInformationProcessor().process(httpClientProcessorContext);
+    public void initializeAsync() throws Exception {
+        group = new NioEventLoopGroup();
+        bootstrap = new Bootstrap();
+        ChannelPipelineInitializer channelPipelineInitializer = new ChannelPipelineInitializer(EmulatorType.HTTP_CLIENT,
+                                                                                               null);
+        channelPipelineInitializer.setClientInformationContext(clientInformationContext);
+        bootstrap.group(group).channel(NioSocketChannel.class).handler(channelPipelineInitializer);
+
+        if (clientInformationContext.getClientConfigBuilderContext().getWritingDelay() > 0) {
+            bootstrap.option(ChannelOption.SO_SNDBUF, 1);
+        }
+
+        processorContextList.clear();
+
+        for (RequestResponseCorrelation requestResponseCorrelation : clientInformationContext
+                .getRequestResponseCorrelation()) {
+            channelPipelineInitializer.setRequestResponseCorrelation(requestResponseCorrelation);
+            HttpClientRequestProcessorContext processorContext = new HttpClientRequestProcessorContext();
+            processorContext.setRequestBuilderContext(requestResponseCorrelation.getRequestBuilderContext());
+            processorContext.setClientInformationContext(clientInformationContext);
+            sendMessage(processorContext);
+            processorContextList.add(processorContext);
+        }
+    }
+
+    public void shutdownClients() throws InterruptedException {
+        for (HttpClientRequestProcessorContext httpClientRequestProcessorContext : processorContextList) {
+            waitTillChannelClose(httpClientRequestProcessorContext);
+        }
+
+        shutdown();
+    }
+
+    private void sendMessage(HttpClientRequestProcessorContext httpClientProcessorContext)
+            throws InterruptedException {
+        HttpRequestInformationProcessor.process(httpClientProcessorContext);
         HttpClientConfigBuilderContext clientConfigBuilderContext = httpClientProcessorContext
                 .getClientInformationContext().getClientConfigBuilderContext();
         ValidationUtil.validateMandatoryParameters(clientConfigBuilderContext);
 
-        Channel ch = bootstrap.connect(clientConfigBuilderContext.getHost(), clientConfigBuilderContext.getPort())
-                .sync().channel();
-        ch.writeAndFlush(httpClientProcessorContext.getRequest());
-        ch.closeFuture().sync();
+        Channel channel = bootstrap.connect(clientConfigBuilderContext.getHost(), clientConfigBuilderContext.getPort())
+                              .sync().channel();
+        channel.writeAndFlush(httpClientProcessorContext.getRequest());
+        httpClientProcessorContext.setChannel(channel);
+    }
+
+    /**
+     * Send the request using HTTP client instance.
+     *
+     * @param httpClientProcessorContext
+     * @throws Exception
+     */
+    private void sendAndWaitForChannelClose(HttpClientRequestProcessorContext httpClientProcessorContext)
+            throws Exception {
+        sendMessage(httpClientProcessorContext);
+        waitTillChannelClose(httpClientProcessorContext);
+    }
+
+    private void waitTillChannelClose(
+            HttpClientRequestProcessorContext httpClientProcessorContext) throws InterruptedException {
+        httpClientProcessorContext.getChannel().closeFuture().sync();
     }
 
     /**

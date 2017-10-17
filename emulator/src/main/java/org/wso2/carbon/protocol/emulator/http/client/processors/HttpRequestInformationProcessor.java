@@ -42,12 +42,11 @@ import java.util.List;
 /**
  * Class to process the Request information of client.
  */
-public class HttpRequestInformationProcessor extends AbstractClientProcessor<HttpClientRequestProcessorContext> {
+public class HttpRequestInformationProcessor {
 
     private static final Logger log = Logger.getLogger(HttpRequestInformationProcessor.class);
 
-    @Override
-    public void process(HttpClientRequestProcessorContext processorContext) {
+    public static void process(HttpClientRequestProcessorContext processorContext) {
         HttpClientConfigBuilderContext clientConfigBuilderContext = processorContext.getClientInformationContext()
                 .getClientConfigBuilderContext();
         String uri = getURI(clientConfigBuilderContext.getHost(), clientConfigBuilderContext.getPort(),
@@ -87,7 +86,7 @@ public class HttpRequestInformationProcessor extends AbstractClientProcessor<Htt
         populateQueryParameters(processorContext);
     }
 
-    private void populateHeader(HttpClientRequestProcessorContext processorContext) {
+    private static void populateHeader(HttpClientRequestProcessorContext processorContext) {
 
         HttpRequest request = processorContext.getRequest();
         HttpClientRequestBuilderContext requestContext = processorContext.getRequestBuilderContext();
@@ -117,7 +116,7 @@ public class HttpRequestInformationProcessor extends AbstractClientProcessor<Htt
         }
     }
 
-    private void populateCookies(HttpClientRequestProcessorContext processorContext) {
+    private static void populateCookies(HttpClientRequestProcessorContext processorContext) {
 
         HttpClientRequestBuilderContext requestContext = processorContext.getRequestBuilderContext();
         if (requestContext.getCookies() != null) {
@@ -131,7 +130,7 @@ public class HttpRequestInformationProcessor extends AbstractClientProcessor<Htt
         }
     }
 
-    private void populateQueryParameters(HttpClientRequestProcessorContext processorContext) {
+    private static void populateQueryParameters(HttpClientRequestProcessorContext processorContext) {
 
         HttpRequest request = processorContext.getRequest();
         List<QueryParameter> queryParameters = processorContext.getClientInformationContext().getRequestContext()
@@ -154,7 +153,7 @@ public class HttpRequestInformationProcessor extends AbstractClientProcessor<Htt
 
     }
 
-    private String getURI(String host, int port, HttpClientRequestBuilderContext requestBuilderContext) {
+    private static String getURI(String host, int port, HttpClientRequestBuilderContext requestBuilderContext) {
         String httpSchema = "http://";
         String path = requestBuilderContext.getPath();
         String uri = host + ":" + port;
