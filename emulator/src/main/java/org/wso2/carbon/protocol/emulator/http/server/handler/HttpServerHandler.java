@@ -157,7 +157,11 @@ public class HttpServerHandler extends ChannelInboundHandlerAdapter {
                     }
                     requestResponseMatchingProcessor = new HttpRequestResponseMatchingProcessor();
                     requestResponseMatchingProcessor.process(httpProcessorContext);
-                    ctx.fireChannelReadComplete();
+                    try {
+                        respondToClient(ctx);
+                    } catch (IOException e) {
+                        log.error("101000--Receiver input/output error sending", e);
+                    }
                 }
             }
         });
@@ -174,8 +178,7 @@ public class HttpServerHandler extends ChannelInboundHandlerAdapter {
 
     }
 
-    @Override
-    public void channelReadComplete(final ChannelHandlerContext ctx) throws IOException {
+    public void respondToClient(final ChannelHandlerContext ctx) throws IOException {
 
         HttpServerConfigBuilderContext serverConfigBuilderContext = serverInformationContext
                 .getServerConfigBuilderContext();
