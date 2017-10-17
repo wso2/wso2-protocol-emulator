@@ -89,7 +89,6 @@ public class HttpClientInitializer {
 
         Channel ch = bootstrap.connect(clientConfigBuilderContext.getHost(), clientConfigBuilderContext.getPort())
                 .sync().channel();
-        ch.isWritable();
         ch.writeAndFlush(httpClientProcessorContext.getRequest());
         ch.closeFuture().sync();
     }
@@ -97,7 +96,7 @@ public class HttpClientInitializer {
     /**
      * Shutdown the HTTP client instance.
      */
-    public void shutdown() {
-        group.shutdownGracefully();
+    public void shutdown() throws InterruptedException {
+        group.shutdownGracefully().await();
     }
 }
