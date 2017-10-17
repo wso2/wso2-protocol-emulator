@@ -25,11 +25,8 @@ import org.apache.log4j.Logger;
 import org.wso2.carbon.protocol.emulator.http.server.contexts.HttpServerInformationContext;
 
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Class to handle chuncked HTTP writing.
@@ -72,7 +69,6 @@ public class HttpChunkedWriteHandler extends ChunkedWriteHandler {
             } catch (Exception e) {
                 log.error("Error while writing data", e);
             }
-            waitingDelay(serverInformationContext.getServerConfigBuilderContext().getWritingDelay());
         });
         thread.start();
         long endTimeMillis = System.currentTimeMillis() + writeTimeOut;
@@ -82,22 +78,6 @@ public class HttpChunkedWriteHandler extends ChunkedWriteHandler {
                 log.info("101504--Connection timeout occurred while writing data to the Channel");
                 break;
             }
-        }
-    }
-
-    private void waitingDelay(int delay) {
-        if (delay != 0) {
-
-            ScheduledFuture scheduledWaitingFuture = scheduledWritingExecutorService
-                    .schedule(callable, delay, TimeUnit.MILLISECONDS);
-            try {
-                scheduledWaitingFuture.get();
-            } catch (InterruptedException e) {
-                log.error(e);
-            } catch (ExecutionException e) {
-                log.error(e);
-            }
-            //scheduledWritingExecutorService.shutdown();
         }
     }
 }

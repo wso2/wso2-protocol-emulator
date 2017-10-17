@@ -29,15 +29,15 @@ import io.netty.handler.logging.LoggingHandler;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.protocol.emulator.dsl.EmulatorType;
 import org.wso2.carbon.protocol.emulator.http.client.ConnectionDroppingWriter;
-import org.wso2.carbon.protocol.emulator.http.client.SlowByteWriter;
 import org.wso2.carbon.protocol.emulator.http.client.contexts.HttpClientInformationContext;
 import org.wso2.carbon.protocol.emulator.http.client.handler.HttpClientHandler;
+import org.wso2.carbon.protocol.emulator.http.common.handler.SlowByteWriterHandler;
+import org.wso2.carbon.protocol.emulator.http.common.handler.SlowReadingHandler;
 import org.wso2.carbon.protocol.emulator.http.server.contexts.HttpServerInformationContext;
 import org.wso2.carbon.protocol.emulator.http.server.contexts.MockServerThread;
 import org.wso2.carbon.protocol.emulator.http.server.handler.HttpChunkedWriteHandler;
 import org.wso2.carbon.protocol.emulator.http.server.handler.HttpServerHandler;
 import org.wso2.carbon.protocol.emulator.http.server.handler.HttpVersionHandler;
-import org.wso2.carbon.protocol.emulator.http.server.handler.SlowReadingHandler;
 
 /**
  * Class to initialize the Channel Pipeline.
@@ -74,9 +74,13 @@ public class ChannelPipelineInitializer extends ChannelInitializer<SocketChannel
      */
     private void initializeHttpServerChannel(SocketChannel ch) {
         ChannelPipeline pipeline = ch.pipeline();
-        int delay = serverInformationContext.getServerConfigBuilderContext().getReadingDelay();
-        if (delay > 0) {
-            pipeline.addLast(new SlowReadingHandler(delay));
+        int readingDelay = serverInformationContext.getServerConfigBuilderContext().getReadingDelay();
+        if (readingDelay > 0) {
+            pipeline.addLast(new SlowReadingHandler(readingDelay));
+        }
+        int writingDelay = serverInformationContext.getServerConfigBuilderContext().getWritingDelay();
+        if (writingDelay > 0) {
+            pipeline.addLast(new SlowByteWriterHandler(writingDelay));
         }
         pipeline.addLast(new HttpServerCodec());
         pipeline.addLast(new HttpChunkedWriteHandler(serverInformationContext));
@@ -99,7 +103,7 @@ public class ChannelPipelineInitializer extends ChannelInitializer<SocketChannel
 
         int writingDelay = clientInformationContext.getClientConfigBuilderContext().getWritingDelay();
         if (writingDelay > 0) {
-            pipeline.addLast(new SlowByteWriter(writingDelay));
+            pipeline.addLast(new SlowByteWriterHandler(writingDelay));
         }
 
         int readingDelay = clientInformationContext.getClientConfigBuilderContext().getReadingDelay();

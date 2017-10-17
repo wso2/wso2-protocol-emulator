@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.carbon.protocol.emulator.http.server.handler;
+package org.wso2.carbon.protocol.emulator.http.common.handler;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
