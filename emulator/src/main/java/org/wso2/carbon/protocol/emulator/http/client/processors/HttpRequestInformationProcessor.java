@@ -91,20 +91,24 @@ public class HttpRequestInformationProcessor extends AbstractClientProcessor<Htt
 
         HttpRequest request = processorContext.getRequest();
         HttpClientRequestBuilderContext requestContext = processorContext.getRequestBuilderContext();
+        HttpClientConfigBuilderContext configBuilderContext = processorContext.getClientInformationContext()
+                                                                                    .getClientConfigBuilderContext();
         request.headers().set(HttpHeaders.Names.HOST,
-                processorContext.getClientInformationContext().getClientConfigBuilderContext().getHost());
+                              configBuilderContext.getHost());
 
-        if (processorContext.getClientInformationContext().getClientConfigBuilderContext().isKeepAlive()) {
+        if (configBuilderContext.isKeepAlive()) {
             request.headers().set(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.KEEP_ALIVE);
         } else {
             request.headers().set(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE);
         }
 
-        request.headers().set(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.GZIP);
-
         if (requestContext.getBody() != null) {
-            request.headers().set(HttpHeaders.Names.CONTENT_LENGTH,
-                    requestContext.getBody().getBytes(Charset.defaultCharset()).length);
+            if (requestContext.isChunkingEnabled()) {
+                HttpHeaders.setTransferEncodingChunked(request);
+            } else {
+                request.headers().set(HttpHeaders.Names.CONTENT_LENGTH,
+                                      requestContext.getBody().getBytes(Charset.defaultCharset()).length);
+            }
         }
         if (requestContext.getHeaders() != null) {
             for (Header header : requestContext.getHeaders()) {

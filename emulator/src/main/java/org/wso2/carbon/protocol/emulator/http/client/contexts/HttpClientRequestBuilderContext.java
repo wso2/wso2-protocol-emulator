@@ -43,6 +43,7 @@ public class HttpClientRequestBuilderContext extends AbstractRequestBuilderConte
     private List<Header> headers;
     private List<QueryParameter> queryParameters;
     private List<Cookie> cookies;
+    private boolean chunking = false;
 
     private static HttpClientRequestBuilderContext getInstance() {
         clientRequest = new HttpClientRequestBuilderContext();
@@ -137,6 +138,11 @@ public class HttpClientRequestBuilderContext extends AbstractRequestBuilderConte
         return this;
     }
 
+    public HttpClientRequestBuilderContext withChunking(boolean enable) {
+        this.chunking = enable;
+        return this;
+    }
+
     public HttpMethod getMethod() {
         return method;
     }
@@ -161,4 +167,7 @@ public class HttpClientRequestBuilderContext extends AbstractRequestBuilderConte
         return cookies;
     }
 
+    public boolean isChunkingEnabled() {
+        return chunking;
+    }
 }
