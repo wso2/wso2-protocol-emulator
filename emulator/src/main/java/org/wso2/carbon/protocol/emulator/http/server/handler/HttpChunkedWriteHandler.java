@@ -68,14 +68,9 @@ public class HttpChunkedWriteHandler extends ChunkedWriteHandler {
 
         Thread thread = new Thread(() -> {
             try {
-                if (ctx.channel().isWritable()) {
-                    HttpChunkedWriteHandler.super.write(ctx, msg, promise);
-                } else {
-                    log.info("101000--Receiver input/output error sending");
-                }
-
+                super.write(ctx, msg, promise);
             } catch (Exception e) {
-                log.error(e);
+                log.error("Error while writing data", e);
             }
             waitingDelay(serverInformationContext.getServerConfigBuilderContext().getWritingDelay());
         });
