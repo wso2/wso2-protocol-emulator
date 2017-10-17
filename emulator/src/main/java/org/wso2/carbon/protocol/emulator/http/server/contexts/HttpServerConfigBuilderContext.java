@@ -19,6 +19,7 @@
 package org.wso2.carbon.protocol.emulator.http.server.contexts;
 
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.handler.codec.http.HttpVersion;
 import org.wso2.carbon.protocol.emulator.dsl.Protocol;
 import org.wso2.carbon.protocol.emulator.dsl.contexts.AbstractConfigurationBuilderContext;
 import org.wso2.carbon.protocol.emulator.http.server.processors.HttpRequestCustomProcessor;
@@ -57,6 +58,7 @@ public class HttpServerConfigBuilderContext extends AbstractConfigurationBuilder
     private boolean connectionFail = false;
     private boolean wireLog = false;
     private boolean keepAlive = true;
+    private HttpVersion httpVersion;
 
     public static HttpServerConfigBuilderContext configure() {
         return new HttpServerConfigBuilderContext();
@@ -96,6 +98,10 @@ public class HttpServerConfigBuilderContext extends AbstractConfigurationBuilder
 
     public boolean isKeepAlive() {
         return keepAlive;
+    }
+
+    public HttpVersion getHttpVersion() {
+        return httpVersion;
     }
 
     public HttpServerConfigBuilderContext keyStore(File keyStore) {
@@ -254,6 +260,11 @@ public class HttpServerConfigBuilderContext extends AbstractConfigurationBuilder
 
     public HttpServerConfigBuilderContext withDisableKeepAlive() {
         keepAlive = false;
+        return this;
+    }
+
+    public HttpServerConfigBuilderContext withHttpVersion(HttpVersion httpVersion) {
+        this.httpVersion = httpVersion;
         return this;
     }
 

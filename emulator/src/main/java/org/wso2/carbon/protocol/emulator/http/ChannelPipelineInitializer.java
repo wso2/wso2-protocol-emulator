@@ -23,6 +23,7 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.http.HttpClientCodec;
 import io.netty.handler.codec.http.HttpServerCodec;
+import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import org.apache.log4j.Logger;
@@ -35,6 +36,7 @@ import org.wso2.carbon.protocol.emulator.http.server.contexts.HttpServerInformat
 import org.wso2.carbon.protocol.emulator.http.server.contexts.MockServerThread;
 import org.wso2.carbon.protocol.emulator.http.server.handler.HttpChunkedWriteHandler;
 import org.wso2.carbon.protocol.emulator.http.server.handler.HttpServerHandler;
+import org.wso2.carbon.protocol.emulator.http.server.handler.HttpVersionHandler;
 import org.wso2.carbon.protocol.emulator.http.server.handler.SlowReadingHandler;
 
 /**
@@ -78,6 +80,10 @@ public class ChannelPipelineInitializer extends ChannelInitializer<SocketChannel
         }
         pipeline.addLast(new HttpServerCodec());
         pipeline.addLast(new HttpChunkedWriteHandler(serverInformationContext));
+        HttpVersion httpVersion = serverInformationContext.getServerConfigBuilderContext().getHttpVersion();
+        if (httpVersion != null) {
+            pipeline.addLast(new HttpVersionHandler(httpVersion));
+        }
         HttpServerHandler httpServerHandler = new HttpServerHandler(serverInformationContext);
         httpServerHandler.setHandlers(handlers);
         pipeline.addLast("httpResponseHandler", httpServerHandler);
