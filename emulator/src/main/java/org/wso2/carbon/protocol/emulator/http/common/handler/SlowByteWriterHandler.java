@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.carbon.protocol.emulator.http.client;
+package org.wso2.carbon.protocol.emulator.http.common.handler;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
@@ -27,10 +27,10 @@ import java.util.concurrent.TimeUnit;
 /**
  * Delay the writing by configured time
  */
-public class SlowByteWriter extends ChannelOutboundHandlerAdapter {
+public class SlowByteWriterHandler extends ChannelOutboundHandlerAdapter {
     private final int writingDelay;
 
-    public SlowByteWriter(int writingDelay) {
+    public SlowByteWriterHandler(int writingDelay) {
         this.writingDelay = writingDelay;
     }
 
