@@ -93,7 +93,13 @@ public class HttpRequestInformationProcessor extends AbstractClientProcessor<Htt
         HttpClientRequestBuilderContext requestContext = processorContext.getRequestBuilderContext();
         request.headers().set(HttpHeaders.Names.HOST,
                 processorContext.getClientInformationContext().getClientConfigBuilderContext().getHost());
-        request.headers().set(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE);
+
+        if (processorContext.getClientInformationContext().getClientConfigBuilderContext().isKeepAlive()) {
+            request.headers().set(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.KEEP_ALIVE);
+        } else {
+            request.headers().set(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE);
+        }
+
         request.headers().set(HttpHeaders.Names.ACCEPT_ENCODING, HttpHeaders.Values.GZIP);
 
         if (requestContext.getBody() != null) {
