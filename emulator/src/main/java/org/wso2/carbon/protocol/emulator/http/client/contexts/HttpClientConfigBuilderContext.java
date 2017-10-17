@@ -40,6 +40,7 @@ public class HttpClientConfigBuilderContext extends AbstractConfigurationBuilder
     private boolean readingConnectionDrop;
     private boolean partialWriteConnectionDrop;
     private int writingDelay = 0;
+    private boolean keepAlive = false;
 
     private static HttpClientConfigBuilderContext getInstance() {
         clientConfigBuilderContext = new HttpClientConfigBuilderContext();
@@ -83,6 +84,11 @@ public class HttpClientConfigBuilderContext extends AbstractConfigurationBuilder
 
     public HttpClientConfigBuilderContext withPartialWriteConnectionDrop() {
         this.partialWriteConnectionDrop = true;
+        return this;
+    }
+
+    public HttpClientConfigBuilderContext withKeepAlive(boolean enable) {
+        this.keepAlive = enable;
         return this;
     }
 
@@ -167,5 +173,9 @@ public class HttpClientConfigBuilderContext extends AbstractConfigurationBuilder
 
     public Boolean getPartialWriteConnectionDrop() {
         return partialWriteConnectionDrop;
+    }
+
+    public boolean isKeepAlive() {
+        return keepAlive;
     }
 }
