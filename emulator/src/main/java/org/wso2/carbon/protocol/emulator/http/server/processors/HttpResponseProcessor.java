@@ -34,6 +34,7 @@ import org.wso2.carbon.protocol.emulator.http.server.contexts.HttpServerProcesso
 import org.wso2.carbon.protocol.emulator.http.server.contexts.HttpServerResponseBuilderContext;
 
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -69,7 +70,7 @@ public class HttpResponseProcessor extends AbstractServerProcessor {
         }
 
         FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, httpResponseStatus, buf);
-        populateHttpHeaders(response, responseContext);
+        populateHttpHeaders(response, responseContext, requestContext);
         populateCookies(response, responseContext);
         if (!response.headers().contains(HttpHeaders.Names.CONTENT_LENGTH)) {
             response.headers().set(HttpHeaders.Names.CONTENT_LENGTH, response.content().readableBytes());
@@ -133,10 +134,22 @@ public class HttpResponseProcessor extends AbstractServerProcessor {
         processorContext.setFinalResponse(response);
     }
 
-    private void populateHttpHeaders(FullHttpResponse response, HttpServerResponseBuilderContext responseContext) {
+    private void populateHttpHeaders(FullHttpResponse response, HttpServerResponseBuilderContext responseContext,
+                                     HttpRequestContext requestContext) {
         if (responseContext.getHeaders() != null) {
             for (Header header : responseContext.getHeaders()) {
                 response.headers().add(header.getName(), header.getValue());
+            }
+        }
+        List<String> copyHeaders;
+        if ((copyHeaders = responseContext.getCopyHeaders()) != null) {
+            Map<String, List<String>> headerParameters = requestContext.getHeaderParameters();
+            List<String> value;
+            for (String key : copyHeaders) {
+                value = headerParameters.get(key);
+                if (value != null) {
+                    response.headers().add(key, value.get(0));
+                }
             }
         }
         response.headers().set(HttpHeaders.Names.CONTENT_LENGTH, response.content().readableBytes());
