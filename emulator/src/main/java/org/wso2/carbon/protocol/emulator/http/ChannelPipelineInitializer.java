@@ -36,6 +36,7 @@ import org.wso2.carbon.protocol.emulator.http.common.handler.SlowByteWriterHandl
 import org.wso2.carbon.protocol.emulator.http.common.handler.SlowReadingHandler;
 import org.wso2.carbon.protocol.emulator.http.server.contexts.HttpServerInformationContext;
 import org.wso2.carbon.protocol.emulator.http.server.contexts.MockServerThread;
+import org.wso2.carbon.protocol.emulator.http.server.handler.HttpChunkedSupportHandler;
 import org.wso2.carbon.protocol.emulator.http.server.handler.HttpChunkedWriteHandler;
 import org.wso2.carbon.protocol.emulator.http.server.handler.HttpServerHandler;
 import org.wso2.carbon.protocol.emulator.http.server.handler.HttpVersionHandler;
@@ -89,6 +90,9 @@ public class ChannelPipelineInitializer extends ChannelInitializer<SocketChannel
         HttpVersion httpVersion = serverInformationContext.getServerConfigBuilderContext().getHttpVersion();
         if (httpVersion != null) {
             pipeline.addLast(new HttpVersionHandler(httpVersion));
+        }
+        if (!serverInformationContext.getServerConfigBuilderContext().isChunking()) {
+            pipeline.addLast(new HttpChunkedSupportHandler());
         }
         HttpServerHandler httpServerHandler = new HttpServerHandler(serverInformationContext);
         httpServerHandler.setHandlers(handlers);

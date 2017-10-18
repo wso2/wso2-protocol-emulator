@@ -58,6 +58,7 @@ public class HttpServerConfigBuilderContext extends AbstractConfigurationBuilder
     private boolean connectionFail = false;
     private boolean wireLog = false;
     private boolean keepAlive = true;
+    private boolean chunking = true;
     private HttpVersion httpVersion;
 
     public static HttpServerConfigBuilderContext configure() {
@@ -98,6 +99,10 @@ public class HttpServerConfigBuilderContext extends AbstractConfigurationBuilder
 
     public boolean isKeepAlive() {
         return keepAlive;
+    }
+
+    public boolean isChunking() {
+        return chunking;
     }
 
     public HttpVersion getHttpVersion() {
@@ -265,6 +270,11 @@ public class HttpServerConfigBuilderContext extends AbstractConfigurationBuilder
 
     public HttpServerConfigBuilderContext withHttpVersion(HttpVersion httpVersion) {
         this.httpVersion = httpVersion;
+        return this;
+    }
+
+    public HttpServerConfigBuilderContext withDisabledChunking() {
+        this.chunking = false;
         return this;
     }
 
