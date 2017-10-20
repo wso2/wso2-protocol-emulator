@@ -37,6 +37,10 @@ public class HttpClientConfigBuilderContext extends AbstractConfigurationBuilder
     private String certPass;
     private File trustStore;
     private String trustStorePass;
+    private boolean readingConnectionDrop;
+    private boolean partialWriteConnectionDrop;
+    private int writingDelay = 0;
+    private boolean keepAlive = false;
 
     private static HttpClientConfigBuilderContext getInstance() {
         clientConfigBuilderContext = new HttpClientConfigBuilderContext();
@@ -70,6 +74,21 @@ public class HttpClientConfigBuilderContext extends AbstractConfigurationBuilder
 
     public HttpClientConfigBuilderContext trustStorePass(String trustStorePass) {
         this.trustStorePass = trustStorePass;
+        return this;
+    }
+
+    public HttpClientConfigBuilderContext withEnableReadingConnectionDrop() {
+        this.readingConnectionDrop = true;
+        return this;
+    }
+
+    public HttpClientConfigBuilderContext withPartialWriteConnectionDrop() {
+        this.partialWriteConnectionDrop = true;
+        return this;
+    }
+
+    public HttpClientConfigBuilderContext withKeepAlive(boolean enable) {
+        this.keepAlive = enable;
         return this;
     }
 
@@ -114,6 +133,11 @@ public class HttpClientConfigBuilderContext extends AbstractConfigurationBuilder
         return this;
     }
 
+    public HttpClientConfigBuilderContext withWritingDelay(int writingDelay) {
+        this.writingDelay = writingDelay;
+        return this;
+    }
+
     public HttpClientConfigBuilderContext withProtocol(Protocol protocol) {
         this.protocol = protocol;
         return this;
@@ -139,4 +163,19 @@ public class HttpClientConfigBuilderContext extends AbstractConfigurationBuilder
         return readingDelay;
     }
 
+    public int getWritingDelay() {
+        return writingDelay;
+    }
+
+    public Boolean getReadingConnectionDrop() {
+        return readingConnectionDrop;
+    }
+
+    public Boolean getPartialWriteConnectionDrop() {
+        return partialWriteConnectionDrop;
+    }
+
+    public boolean isKeepAlive() {
+        return keepAlive;
+    }
 }

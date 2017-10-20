@@ -19,6 +19,7 @@
 package org.wso2.carbon.protocol.emulator.http.server.contexts;
 
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.handler.codec.http.HttpVersion;
 import org.wso2.carbon.protocol.emulator.dsl.Protocol;
 import org.wso2.carbon.protocol.emulator.dsl.contexts.AbstractConfigurationBuilderContext;
 import org.wso2.carbon.protocol.emulator.http.server.processors.HttpRequestCustomProcessor;
@@ -30,7 +31,6 @@ import java.io.File;
  * Class for Http Server ConfigBuilderContext.
  */
 public class HttpServerConfigBuilderContext extends AbstractConfigurationBuilderContext {
-    private static HttpServerConfigBuilderContext config;
     private String host = null;
     private int port;
     private String context;
@@ -57,14 +57,12 @@ public class HttpServerConfigBuilderContext extends AbstractConfigurationBuilder
     private int connectTimeOut = 0;
     private boolean connectionFail = false;
     private boolean wireLog = false;
-
-    private static HttpServerConfigBuilderContext getInstance() {
-        config = new HttpServerConfigBuilderContext();
-        return config;
-    }
+    private boolean keepAlive = true;
+    private boolean chunking = true;
+    private HttpVersion httpVersion;
 
     public static HttpServerConfigBuilderContext configure() {
-        return getInstance();
+        return new HttpServerConfigBuilderContext();
     }
 
     public boolean isWireLog() {
@@ -97,6 +95,18 @@ public class HttpServerConfigBuilderContext extends AbstractConfigurationBuilder
 
     public int getWriteTimeOut() {
         return writeTimeOut;
+    }
+
+    public boolean isKeepAlive() {
+        return keepAlive;
+    }
+
+    public boolean isChunking() {
+        return chunking;
+    }
+
+    public HttpVersion getHttpVersion() {
+        return httpVersion;
     }
 
     public HttpServerConfigBuilderContext keyStore(File keyStore) {
@@ -250,6 +260,21 @@ public class HttpServerConfigBuilderContext extends AbstractConfigurationBuilder
 
     public HttpServerConfigBuilderContext withEnableWireLog() {
         wireLog = true;
+        return this;
+    }
+
+    public HttpServerConfigBuilderContext withDisableKeepAlive() {
+        keepAlive = false;
+        return this;
+    }
+
+    public HttpServerConfigBuilderContext withHttpVersion(HttpVersion httpVersion) {
+        this.httpVersion = httpVersion;
+        return this;
+    }
+
+    public HttpServerConfigBuilderContext withDisabledChunking() {
+        this.chunking = false;
         return this;
     }
 

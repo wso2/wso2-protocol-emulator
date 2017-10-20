@@ -40,6 +40,7 @@ public class HttpServerResponseBuilderContext extends AbstractResponseBuilderCon
     private HttpResponseStatus statusCode = HttpResponseStatus.OK;
     private List<Cookie> cookies;
     private List<Header> headers;
+    private List<String> copyHeaders;
     private String body;
 
     private static HttpServerResponseBuilderContext getInstance() {
@@ -111,6 +112,14 @@ public class HttpServerResponseBuilderContext extends AbstractResponseBuilderCon
         return this;
     }
 
+    public HttpServerResponseBuilderContext withCopyHeader(String name) {
+        if (copyHeaders == null) {
+            this.copyHeaders = new ArrayList<String>();
+        }
+        copyHeaders.add(name);
+        return this;
+    }
+
     public HttpServerResponseBuilderContext withEmptyBody() {
         return this;
     }
@@ -125,6 +134,10 @@ public class HttpServerResponseBuilderContext extends AbstractResponseBuilderCon
 
     public List<Header> getHeaders() {
         return headers;
+    }
+
+    public List<String> getCopyHeaders() {
+        return copyHeaders;
     }
 
     public String getBody() {

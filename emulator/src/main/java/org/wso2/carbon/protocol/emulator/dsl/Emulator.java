@@ -23,15 +23,13 @@ import org.wso2.carbon.protocol.emulator.http.HTTPProtocolEmulator;
 /**
  * Initialize the Emulator instance.
  */
-public class Emulator extends Thread {
-    private static HTTPProtocolEmulator httpProtocolEmulator;
+public class Emulator {
 
     /**
      * Return emulator instance for HTTP protocol.
      * @return HTTPProtocolEmulator
      */
     public static HTTPProtocolEmulator getHttpEmulator() {
-        httpProtocolEmulator = new HTTPProtocolEmulator();
-        return httpProtocolEmulator;
+        return new HTTPProtocolEmulator();
     }
 }

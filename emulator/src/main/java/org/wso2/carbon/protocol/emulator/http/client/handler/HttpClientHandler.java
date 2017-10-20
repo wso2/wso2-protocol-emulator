@@ -25,8 +25,10 @@ import io.netty.handler.codec.http.HttpContent;
 import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.LastHttpContent;
 import org.apache.log4j.Logger;
+import org.wso2.carbon.protocol.emulator.http.client.contexts.HttpClientConfigBuilderContext;
 import org.wso2.carbon.protocol.emulator.http.client.contexts.HttpClientInformationContext;
 import org.wso2.carbon.protocol.emulator.http.client.contexts.HttpClientResponseProcessorContext;
+import org.wso2.carbon.protocol.emulator.http.client.contexts.RequestResponseCorrelation;
 import org.wso2.carbon.protocol.emulator.http.client.processors.HttpResponseAssertProcessor;
 import org.wso2.carbon.protocol.emulator.http.client.processors.HttpResponseInformationProcessor;
 import org.wso2.carbon.protocol.emulator.util.WireLogHandler;
@@ -39,28 +41,37 @@ import java.util.concurrent.ScheduledExecutorService;
  */
 public class HttpClientHandler extends ChannelInboundHandlerAdapter {
     private static final Logger log = Logger.getLogger(HttpClientHandler.class);
+    private final RequestResponseCorrelation requestResponseCorrelation;
     private HttpResponseInformationProcessor responseInformationProcessor;
-    private HttpResponseAssertProcessor responseAssertProcessor;
     private HttpClientResponseProcessorContext processorContext;
     private HttpClientInformationContext clientInformationContext;
     private ScheduledExecutorService scheduledReadingExecutorService;
     private int corePoolSize = 10;
 
-    public HttpClientHandler(HttpClientInformationContext clientInformationContext) {
+    public HttpClientHandler(HttpClientInformationContext clientInformationContext,
+            RequestResponseCorrelation requestResponseCorrelation) {
         this.clientInformationContext = clientInformationContext;
+        this.requestResponseCorrelation = requestResponseCorrelation;
         scheduledReadingExecutorService = Executors.newScheduledThreadPool(corePoolSize);
     }
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
+        HttpClientConfigBuilderContext configBuilderContext
+                = clientInformationContext.getClientConfigBuilderContext();
 
         WireLogHandler.responseWireLog(msg);
+
+        Boolean connectionDrop = configBuilderContext.getReadingConnectionDrop();
+        if (connectionDrop != null && connectionDrop && ctx.channel().isOpen()) {
+            ctx.close();
+            log.info("Client Connection dropped while Reading data from the channel");
+        }
 
         if (msg instanceof HttpResponse) {
             this.processorContext = new HttpClientResponseProcessorContext();
             this.processorContext.setClientInformationContext(clientInformationContext);
             this.responseInformationProcessor = new HttpResponseInformationProcessor();
-            this.responseAssertProcessor = new HttpResponseAssertProcessor();
             HttpResponse response = (HttpResponse) msg;
             processorContext.setReceivedResponse(response);
             responseInformationProcessor.process(processorContext);
@@ -76,10 +87,10 @@ public class HttpClientHandler extends ChannelInboundHandlerAdapter {
             }
         }
         if (msg instanceof LastHttpContent) {
-            if (responseAssertProcessor != null) {
-                this.responseAssertProcessor.process(processorContext);
-                this.clientInformationContext.setReceivedResponseProcessContext(processorContext);
-            }
+            requestResponseCorrelation.setReceivedResponse(processorContext);
+            HttpResponseAssertProcessor.process(processorContext, requestResponseCorrelation.getExpectedResponse());
+            this.clientInformationContext.setReceivedResponseProcessContext(processorContext);
+
             String responseBody = processorContext.getReceivedResponseContext().getResponseBody();
             if (responseBody != null) {
                 WireLogHandler.logResponseBody(responseBody);
