@@ -18,6 +18,11 @@
 
 package org.wso2.carbon.protocol.emulator.dsl.contexts;
 
+import org.wso2.carbon.protocol.emulator.http.client.contexts.HttpClientOperationBuilderContext;
+import org.wso2.carbon.protocol.emulator.http.client.contexts.RequestResponseCorrelation;
+
+import java.util.List;
+
 /**
  * Abstract class for ClientOperationBuilderContext.
  */
@@ -25,7 +30,7 @@ public abstract class AbstractClientOperationBuilderContext extends AbstractOper
 
     public abstract AbstractClientProcessorContext send();
 
-    public abstract void sendAsync();
+    public abstract HttpClientOperationBuilderContext sendAsync();
 
-    public abstract void shutdown();
+    public abstract List<RequestResponseCorrelation> shutdown();
 }
