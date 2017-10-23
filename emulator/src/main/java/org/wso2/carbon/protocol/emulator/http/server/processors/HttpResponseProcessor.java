@@ -24,7 +24,6 @@ import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http.ServerCookieEncoder;
 import io.netty.util.CharsetUtil;
 import org.wso2.carbon.protocol.emulator.http.params.Cookie;
@@ -69,7 +68,8 @@ public class HttpResponseProcessor extends AbstractServerProcessor {
             buf = Unpooled.buffer(0);
         }
 
-        FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, httpResponseStatus, buf);
+        FullHttpResponse response = new DefaultFullHttpResponse(requestContext.getHttpVersion(),
+                                                                httpResponseStatus, buf);
         populateHttpHeaders(response, responseContext, requestContext);
         populateCookies(response, responseContext);
         if (!response.headers().contains(HttpHeaders.Names.CONTENT_LENGTH)) {
@@ -125,7 +125,8 @@ public class HttpResponseProcessor extends AbstractServerProcessor {
         HttpRequestContext requestContext = processorContext.getHttpRequestContext();
         boolean keepAlive = requestContext.isKeepAlive() &&
                 processorContext.getServerInformationContext().getServerConfigBuilderContext().isKeepAlive();
-        FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, NOT_FOUND);
+        FullHttpResponse response = new DefaultFullHttpResponse(processorContext.getHttpRequestContext()
+                                                                                .getHttpVersion(), NOT_FOUND);
         response.headers().set(HttpHeaders.Names.CONTENT_TYPE, "text/plain; charset=UTF-8");
         response.headers().set(HttpHeaders.Names.CONTENT_LENGTH, response.content().readableBytes());
         if (keepAlive) {
