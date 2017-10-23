@@ -19,6 +19,7 @@
 package org.wso2.carbon.protocol.emulator.http.client.contexts;
 
 import io.netty.handler.codec.http.HttpMethod;
+import io.netty.handler.codec.http.HttpVersion;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.protocol.emulator.dsl.contexts.AbstractRequestBuilderContext;
 import org.wso2.carbon.protocol.emulator.http.params.Cookie;
@@ -44,6 +45,7 @@ public class HttpClientRequestBuilderContext extends AbstractRequestBuilderConte
     private List<QueryParameter> queryParameters;
     private List<Cookie> cookies;
     private boolean chunking = false;
+    private HttpVersion httpVersion = HttpVersion.HTTP_1_1;
 
     private static HttpClientRequestBuilderContext getInstance() {
         clientRequest = new HttpClientRequestBuilderContext();
@@ -118,6 +120,12 @@ public class HttpClientRequestBuilderContext extends AbstractRequestBuilderConte
         return this;
     }
 
+    public HttpClientRequestBuilderContext withHttpVersion(HttpVersion version) {
+        httpVersion = version;
+
+        return this;
+    }
+
     public HttpClientRequestBuilderContext withCookie(String name, String value) {
         Cookie cookie = new Cookie(name, value);
 
@@ -165,6 +173,13 @@ public class HttpClientRequestBuilderContext extends AbstractRequestBuilderConte
 
     public List<Cookie> getCookies() {
         return cookies;
+    }
+
+    /**
+     * Getter for httpVersion
+     */
+    public HttpVersion getHttpVersion() {
+        return httpVersion;
     }
 
     public boolean isChunkingEnabled() {

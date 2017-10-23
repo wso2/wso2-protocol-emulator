@@ -61,12 +61,16 @@ public class HttpRequestInformationProcessor extends AbstractServerProcessor {
     }
 
     private void appendDecoderResult(HttpContent httpContent, HttpRequestContext requestContext) {
-        requestContext.appendResponseContent(httpContent.content().toString(CharsetUtil.UTF_8));
-        DecoderResult result = httpContent.getDecoderResult();
-        if (result.isSuccess()) {
-            return;
+        try {
+            requestContext.appendResponseContent(httpContent.content().toString(CharsetUtil.UTF_8));
+            DecoderResult result = httpContent.getDecoderResult();
+            if (result.isSuccess()) {
+                return;
+            }
+            requestContext.appendResponseContent(result.cause());
+        } finally {
+            httpContent.release();
         }
-        requestContext.appendResponseContent(result.cause());
     }
 
     private void populateQueryParameters(HttpRequest request, HttpRequestContext requestContext) {

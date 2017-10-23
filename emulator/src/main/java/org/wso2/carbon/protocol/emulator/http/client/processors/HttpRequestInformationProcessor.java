@@ -66,6 +66,8 @@ public class HttpRequestInformationProcessor {
             log.error("Only HTTP(S) is supported.");
         }
 
+        HttpVersion httpVersion = processorContext.getRequestBuilderContext().getHttpVersion();
+
         ByteBuf content;
         HttpRequest request;
         if (processorContext.getRequestBuilderContext().getBody() != null) {
@@ -73,10 +75,12 @@ public class HttpRequestInformationProcessor {
             String rawData = processorContext.getRequestBuilderContext().getBody();
             byte[] bytes = rawData.getBytes(Charset.defaultCharset());
             content = Unpooled.wrappedBuffer(bytes);
-            request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1,
-                    processorContext.getRequestBuilderContext().getMethod(), requestUri.getRawPath(), content);
+            request = new DefaultFullHttpRequest(httpVersion,
+                                                 processorContext.getRequestBuilderContext().getMethod(),
+                                                 requestUri.getRawPath(),
+                                                 content);
         } else {
-            request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1,
+            request = new DefaultFullHttpRequest(httpVersion,
                     processorContext.getRequestBuilderContext().getMethod(), requestUri.getRawPath());
         }
 
