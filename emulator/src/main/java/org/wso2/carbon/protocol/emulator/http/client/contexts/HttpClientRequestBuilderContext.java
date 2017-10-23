@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.protocol.emulator.http.client.contexts;
 
+import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpVersion;
 import org.apache.log4j.Logger;
@@ -69,6 +70,11 @@ public class HttpClientRequestBuilderContext extends AbstractRequestBuilderConte
     public HttpClientRequestBuilderContext withBody(String body) {
         this.body = body;
         return this;
+    }
+
+    public HttpClientRequestBuilderContext withXmlPayload(String body) {
+        this.body = body;
+        return this.withHeader(HttpHeaders.Names.CONTENT_TYPE, "application/xml");
     }
 
     public HttpClientRequestBuilderContext withBody(File filePath) {
