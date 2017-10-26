@@ -79,11 +79,15 @@ public class HttpClientHandler extends ChannelInboundHandlerAdapter {
 
         if (msg instanceof HttpContent) {
             HttpContent httpContent = (HttpContent) msg;
-            ByteBuf content = httpContent.content();
+            try {
+                ByteBuf content = httpContent.content();
 
-            if (content.isReadable()) {
-                this.responseInformationProcessor
-                        .appendDecoderResult(processorContext.getReceivedResponseContext(), httpContent, content);
+                if (content.isReadable()) {
+                    this.responseInformationProcessor
+                            .appendDecoderResult(processorContext.getReceivedResponseContext(), httpContent, content);
+                }
+            } finally {
+                httpContent.release();
             }
         }
         if (msg instanceof LastHttpContent) {
