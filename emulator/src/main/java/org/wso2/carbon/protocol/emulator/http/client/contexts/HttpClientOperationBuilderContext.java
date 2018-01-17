@@ -21,6 +21,8 @@ package org.wso2.carbon.protocol.emulator.http.client.contexts;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.protocol.emulator.dsl.contexts.AbstractClientOperationBuilderContext;
 
+import java.util.List;
+
 /**
  * Class for request sending operation of HTTP client.
  */
@@ -39,6 +41,28 @@ public class HttpClientOperationBuilderContext extends AbstractClientOperationBu
         } catch (Exception e) {
             log.error("Exception occurred while sending message" + e);
         }
-        return httpClientInformationContext.getReceivedResponseProcessContext();
+        return httpClientInformationContext.getLastReceivedResponseProcessContext();
     }
+
+    @Override
+    public HttpClientOperationBuilderContext sendAsync() {  //recommanded for a one request only
+        try {
+            this.httpClientInformationContext.getClientInitializer().initializeAsync();
+        } catch (Exception e) {
+            log.error("Exception occurred while sending message", e);
+        }
+        return this;
+    }
+
+    @Override
+    public List<RequestResponseCorrelation> shutdown() {
+        try {
+            this.httpClientInformationContext.getClientInitializer().shutdownClients();
+        } catch (InterruptedException e) {
+            log.error("Exception occurred while shutting down clients", e);
+        }
+        return httpClientInformationContext.getRequestResponseCorrelation();
+    }
+
+
 }

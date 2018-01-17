@@ -23,16 +23,23 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.http.HttpClientCodec;
 import io.netty.handler.codec.http.HttpServerCodec;
+import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import org.apache.log4j.Logger;
 import org.wso2.carbon.protocol.emulator.dsl.EmulatorType;
+import org.wso2.carbon.protocol.emulator.http.client.ConnectionDroppingWriter;
 import org.wso2.carbon.protocol.emulator.http.client.contexts.HttpClientInformationContext;
+import org.wso2.carbon.protocol.emulator.http.client.contexts.RequestResponseCorrelation;
 import org.wso2.carbon.protocol.emulator.http.client.handler.HttpClientHandler;
+import org.wso2.carbon.protocol.emulator.http.common.handler.SlowByteWriterHandler;
+import org.wso2.carbon.protocol.emulator.http.common.handler.SlowReadingHandler;
 import org.wso2.carbon.protocol.emulator.http.server.contexts.HttpServerInformationContext;
 import org.wso2.carbon.protocol.emulator.http.server.contexts.MockServerThread;
+import org.wso2.carbon.protocol.emulator.http.server.handler.HttpChunkedSupportHandler;
 import org.wso2.carbon.protocol.emulator.http.server.handler.HttpChunkedWriteHandler;
 import org.wso2.carbon.protocol.emulator.http.server.handler.HttpServerHandler;
+import org.wso2.carbon.protocol.emulator.http.server.handler.HttpVersionHandler;
 
 /**
  * Class to initialize the Channel Pipeline.
@@ -42,6 +49,7 @@ public class ChannelPipelineInitializer extends ChannelInitializer<SocketChannel
     private EmulatorType emulatorType;
     private HttpServerInformationContext serverInformationContext;
     private HttpClientInformationContext clientInformationContext;
+    private RequestResponseCorrelation requestResponseCorrelation;
     private MockServerThread[] handlers;
 
     public ChannelPipelineInitializer(EmulatorType emulatorType, MockServerThread[] handlers) {
@@ -64,12 +72,28 @@ public class ChannelPipelineInitializer extends ChannelInitializer<SocketChannel
 
     /**
      * Initialize Http Server Channel.
+     *
      * @param ch {instance of SocketChannel}
      */
     private void initializeHttpServerChannel(SocketChannel ch) {
         ChannelPipeline pipeline = ch.pipeline();
+        int readingDelay = serverInformationContext.getServerConfigBuilderContext().getReadingDelay();
+        if (readingDelay > 0) {
+            pipeline.addLast(new SlowReadingHandler(readingDelay));
+        }
+        int writingDelay = serverInformationContext.getServerConfigBuilderContext().getWritingDelay();
+        if (writingDelay > 0) {
+            pipeline.addLast(new SlowByteWriterHandler(writingDelay));
+        }
         pipeline.addLast(new HttpServerCodec());
         pipeline.addLast(new HttpChunkedWriteHandler(serverInformationContext));
+        HttpVersion httpVersion = serverInformationContext.getServerConfigBuilderContext().getHttpVersion();
+        if (httpVersion != null) {
+            pipeline.addLast(new HttpVersionHandler(httpVersion));
+        }
+        if (!serverInformationContext.getServerConfigBuilderContext().isChunking()) {
+            pipeline.addLast(new HttpChunkedSupportHandler());
+        }
         HttpServerHandler httpServerHandler = new HttpServerHandler(serverInformationContext);
         httpServerHandler.setHandlers(handlers);
         pipeline.addLast("httpResponseHandler", httpServerHandler);
@@ -78,8 +102,23 @@ public class ChannelPipelineInitializer extends ChannelInitializer<SocketChannel
 
     private void initializeHttpClientChannel(SocketChannel ch) {
         ChannelPipeline pipeline = ch.pipeline();
+
+        if (clientInformationContext.getClientConfigBuilderContext().getPartialWriteConnectionDrop()) {
+            pipeline.addLast(new ConnectionDroppingWriter());
+        }
+
+        int writingDelay = clientInformationContext.getClientConfigBuilderContext().getWritingDelay();
+        if (writingDelay > 0) {
+            pipeline.addLast(new SlowByteWriterHandler(writingDelay));
+        }
+
+        int readingDelay = clientInformationContext.getClientConfigBuilderContext().getReadingDelay();
+        if (readingDelay > 0) {
+            pipeline.addLast(new SlowReadingHandler(readingDelay));
+        }
+
         pipeline.addLast(new HttpClientCodec());
-        pipeline.addLast(new HttpClientHandler(clientInformationContext));
+        pipeline.addLast(new HttpClientHandler(clientInformationContext, requestResponseCorrelation));
         pipeline.addLast(new LoggingHandler(LogLevel.DEBUG));
     }
 
@@ -89,5 +128,9 @@ public class ChannelPipelineInitializer extends ChannelInitializer<SocketChannel
 
     public void setClientInformationContext(HttpClientInformationContext clientInformationContext) {
         this.clientInformationContext = clientInformationContext;
+    }
+
+    public void setRequestResponseCorrelation(RequestResponseCorrelation responseProcessorContext) {
+        this.requestResponseCorrelation = responseProcessorContext;
     }
 }

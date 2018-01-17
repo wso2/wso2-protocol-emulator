@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.protocol.emulator.http.client.contexts;
 
+import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpRequest;
 
 /**
@@ -26,6 +27,7 @@ import io.netty.handler.codec.http.HttpRequest;
 public class HttpClientRequestProcessorContext extends HttpClientProcessorContext {
     private HttpClientRequestBuilderContext requestBuilderContext;
     private HttpRequest request;
+    private Channel channel;
 
     public HttpClientRequestBuilderContext getRequestBuilderContext() {
         return requestBuilderContext;
@@ -41,5 +43,13 @@ public class HttpClientRequestProcessorContext extends HttpClientProcessorContex
 
     public void setRequest(HttpRequest request) {
         this.request = request;
+    }
+
+    public void setChannel(Channel channel) {
+        this.channel = channel;
+    }
+
+    public Channel getChannel() {
+        return channel;
     }
 }

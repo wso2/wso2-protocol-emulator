@@ -20,18 +20,17 @@ package org.wso2.carbon.protocol.emulator.http.client.contexts;
 
 import org.wso2.carbon.protocol.emulator.http.client.HttpClientInitializer;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Class for HTTP client request response information context.
  */
 public class HttpClientInformationContext {
     private HttpClientConfigBuilderContext clientConfigBuilderContext;
-    private Map<HttpClientRequestBuilderContext, HttpClientResponseBuilderContext> correlation;
+    private List<RequestResponseCorrelation> correlation;
     private HttpClientInitializer clientInitializer;
     private HttpClientRequestBuilderContext requestContext;
-    private HttpClientResponseBuilderContext expectedResponse;
     private HttpClientResponseProcessorContext receivedProcessContext;
 
     public HttpClientConfigBuilderContext getClientConfigBuilderContext() {
@@ -42,16 +41,16 @@ public class HttpClientInformationContext {
         this.clientConfigBuilderContext = clientConfigBuilderContext;
     }
 
-    public Map<HttpClientRequestBuilderContext, HttpClientResponseBuilderContext> getRequestResponseCorrelation() {
+    public List<RequestResponseCorrelation> getRequestResponseCorrelation() {
         return correlation;
     }
 
     public void addCorrelation(HttpClientRequestBuilderContext httpClientRequestBuilderContext,
-                               HttpClientResponseBuilderContext httpClientResponseBuilderContext) {
+                               HttpClientResponseBuilderContext expectedResponseContext) {
         if (correlation == null) {
-            this.correlation = new HashMap<HttpClientRequestBuilderContext, HttpClientResponseBuilderContext>();
+            this.correlation = new ArrayList<>();
         }
-        correlation.put(httpClientRequestBuilderContext, httpClientResponseBuilderContext);
+        correlation.add(new RequestResponseCorrelation(httpClientRequestBuilderContext, expectedResponseContext));
     }
 
     public HttpClientInitializer getClientInitializer() {
@@ -70,19 +69,12 @@ public class HttpClientInformationContext {
         this.requestContext = requestContext;
     }
 
-    public HttpClientResponseBuilderContext getExpectedResponse() {
-        return expectedResponse;
-    }
-
-    public void setExpectedResponse(HttpClientResponseBuilderContext expectedResponse) {
-        this.expectedResponse = expectedResponse;
-    }
-
-    public HttpClientResponseProcessorContext getReceivedResponseProcessContext() {
+    public HttpClientResponseProcessorContext getLastReceivedResponseProcessContext() {
         return receivedProcessContext;
     }
 
     public void setReceivedResponseProcessContext(HttpClientResponseProcessorContext receivedProcessContext) {
         this.receivedProcessContext = receivedProcessContext;
     }
+
 }

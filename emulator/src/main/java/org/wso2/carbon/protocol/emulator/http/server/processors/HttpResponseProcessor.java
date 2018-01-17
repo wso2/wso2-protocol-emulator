@@ -24,7 +24,6 @@ import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http.ServerCookieEncoder;
 import io.netty.util.CharsetUtil;
 import org.wso2.carbon.protocol.emulator.http.params.Cookie;
@@ -34,6 +33,7 @@ import org.wso2.carbon.protocol.emulator.http.server.contexts.HttpServerProcesso
 import org.wso2.carbon.protocol.emulator.http.server.contexts.HttpServerResponseBuilderContext;
 
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -56,7 +56,8 @@ public class HttpResponseProcessor extends AbstractServerProcessor {
     private void populateResponse(HttpServerProcessorContext processorContext) {
         HttpRequestContext requestContext = processorContext.getHttpRequestContext();
         HttpServerResponseBuilderContext responseContext = processorContext.getSelectedResponseContext();
-        boolean keepAlive = requestContext.isKeepAlive();
+        boolean keepAlive = requestContext.isKeepAlive() &&
+                processorContext.getServerInformationContext().getServerConfigBuilderContext().isKeepAlive();
         Pattern pattern = processorContext.getServerInformationContext().getUtilityContext().getPattern();
         HttpResponseStatus httpResponseStatus = responseContext.getStatusCode();
 
@@ -67,8 +68,9 @@ public class HttpResponseProcessor extends AbstractServerProcessor {
             buf = Unpooled.buffer(0);
         }
 
-        FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, httpResponseStatus, buf);
-        populateHttpHeaders(response, responseContext);
+        FullHttpResponse response = new DefaultFullHttpResponse(requestContext.getHttpVersion(),
+                                                                httpResponseStatus, buf);
+        populateHttpHeaders(response, responseContext, requestContext);
         populateCookies(response, responseContext);
         if (!response.headers().contains(HttpHeaders.Names.CONTENT_LENGTH)) {
             response.headers().set(HttpHeaders.Names.CONTENT_LENGTH, response.content().readableBytes());
@@ -121,8 +123,10 @@ public class HttpResponseProcessor extends AbstractServerProcessor {
 
     private void populate404NotFoundResponse(HttpServerProcessorContext processorContext) {
         HttpRequestContext requestContext = processorContext.getHttpRequestContext();
-        boolean keepAlive = requestContext.isKeepAlive();
-        FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, NOT_FOUND);
+        boolean keepAlive = requestContext.isKeepAlive() &&
+                processorContext.getServerInformationContext().getServerConfigBuilderContext().isKeepAlive();
+        FullHttpResponse response = new DefaultFullHttpResponse(processorContext.getHttpRequestContext()
+                                                                                .getHttpVersion(), NOT_FOUND);
         response.headers().set(HttpHeaders.Names.CONTENT_TYPE, "text/plain; charset=UTF-8");
         response.headers().set(HttpHeaders.Names.CONTENT_LENGTH, response.content().readableBytes());
         if (keepAlive) {
@@ -131,10 +135,22 @@ public class HttpResponseProcessor extends AbstractServerProcessor {
         processorContext.setFinalResponse(response);
     }
 
-    private void populateHttpHeaders(FullHttpResponse response, HttpServerResponseBuilderContext responseContext) {
+    private void populateHttpHeaders(FullHttpResponse response, HttpServerResponseBuilderContext responseContext,
+                                     HttpRequestContext requestContext) {
         if (responseContext.getHeaders() != null) {
             for (Header header : responseContext.getHeaders()) {
                 response.headers().add(header.getName(), header.getValue());
+            }
+        }
+        List<String> copyHeaders;
+        if ((copyHeaders = responseContext.getCopyHeaders()) != null) {
+            Map<String, List<String>> headerParameters = requestContext.getHeaderParameters();
+            List<String> value;
+            for (String key : copyHeaders) {
+                value = headerParameters.get(key);
+                if (value != null) {
+                    response.headers().add(key, value.get(0));
+                }
             }
         }
         response.headers().set(HttpHeaders.Names.CONTENT_LENGTH, response.content().readableBytes());
@@ -144,7 +160,7 @@ public class HttpResponseProcessor extends AbstractServerProcessor {
         if (responseContext.getCookies() != null) {
             for (Cookie cookie : responseContext.getCookies()) {
                 response.headers().add(HttpHeaders.Names.SET_COOKIE,
-                        ServerCookieEncoder.encode(cookie.getName(), cookie.getValue()));
+                                       ServerCookieEncoder.encode(cookie.getName(), cookie.getValue()));
             }
         }
     }
